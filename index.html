@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="ie ie8 lte9 lte8" lang="ru"><![endif]-->
+<!--[if IE 9]><html class="ie ie9 lte9" lang="ru"><![endif]-->
+<!--[if gt IE 9]><html lang="ru"><![endif]--><!--[if !IE]><!--><html lang="ru"><!--<![endif]-->
+    <head>
+        <title>test</title>
+        <meta charset="utf-8">
+        <!--[if lt IE 9]><script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+        <link rel="stylesheet" href="stylesheets/style.css">
+    </head>
+    <body>
+        <form action="index.html" method="get">
+            <div>
+                <label for="filter_registered">Дата</label>
+                <select name="registered" id="filter_registered" data-filter-emptylabel="Любая"></select>
+
+                <label for="filter_gender">Пол</label>
+                <select name="gender" id="filter_gender" data-filter-emptylabel="Без разницы"></select>
+
+                <label for="filter_age">Возраст</label>
+                <select name="age" id="filter_age" data-filter-emptylabel="Любой"></select>
+
+                <!-- <label for="filter_name">Имя</label> -->
+                <!-- <select name="gender" id="filter_name" data-filter-emptylabel="Без разницы"></select> -->
+
+                <label for="filter_fruit">Фрукт</label>
+                <select name="fruit" id="filter_fruit" data-filter-emptylabel="Любой"></select>
+
+                <label for="filter_color">Цвет</label>
+                <select name="color" id="filter_color" data-filter-emptylabel="Любой"></select>
+
+                <label for="filter_os">OS</label>
+                <select name="os" id="filter_os" data-filter-emptylabel="Неважно"></select>
+
+                <label for="filter_mobile">Mobile</label>
+                <select name="mobile" id="filter_mobile" data-filter-emptylabel="Неважно"></select>
+
+                <label for="filter_active">Активен</label>
+                <select name="active" id="filter_active" data-filter-emptylabel="Неважно"></select>
+            </div>
+        </form>
+        <ul id="container"></ul>
+        <script src="javascripts/jquery-1.11.0.min.js"></script>
+        <script src="javascripts/polyfill.js"></script>
+        <script src="javascripts/filter.js"></script>
+        <script src="javascripts/data.js"></script>
+        <script src="javascripts/application.js"></script>
+    </body>
+</html>
