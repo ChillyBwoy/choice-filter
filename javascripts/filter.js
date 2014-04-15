@@ -82,6 +82,7 @@
         }
 
         function filterSearch (fields, data, filters, filterStack) {
+
             if (filterStack.length === 0) {
                 return {'data': data, 'filters': filters};
             }
@@ -90,9 +91,9 @@
                 results       = $.grep(data, function (item) {
                                     return (item.values[currentFilter.name] ==
                                             currentFilter.value);
-                                });
-            return filterSearch(fields, results, initFilters(fields, results),
-                                filterStack);
+                                }),
+                newFilters    = initFilters(fields, results);
+            return filterSearch(fields, results, newFilters, filterStack);
         }
 
         var Filter = function ($nodes, fields, handler) {
@@ -147,9 +148,12 @@
                     });
 
                     if (value) {
-                        if (!filterIsInStack.length) {
-                            self.filterStack.push({'name': name, 'value': value});
+                        if (filterIsInStack.length) {
+                            self.filterStack = $.grep(self.filterStack, function (item) {
+                                return item.name !== name;
+                            });
                         }
+                        self.filterStack.push({'name': name, 'value': value});
                     } else {
                         self.filterStack = $.grep(self.filterStack, function (item) {
                             return item.name !== name;
