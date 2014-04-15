@@ -7,7 +7,6 @@
             return f ? f.call(null, v) : v;
         };
 
-
         function initData (fields, $nodes) {
             return $nodes.map(function (i, item) {
                 var node    = $(item),
