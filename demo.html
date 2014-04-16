@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>DataFilter</title>
+        <meta charset="utf-8">
+        <link rel="stylesheet" href="https://rawgit.com/ChillyBwoy/datafilter/master/stylesheets/style.css">
+    </head>
+    <body>
+        <form action="index.html" method="get">
+            <div>
+                <label for="filter_registered">Дата</label>
+                <select name="registered" id="filter_registered" data-filter-emptylabel=""></select>
+
+                <label for="filter_gender">Пол</label>
+                <select name="gender" id="filter_gender" data-filter-emptylabel=""></select>
+
+                <label for="filter_age">Возраст</label>
+                <select name="age" id="filter_age" data-filter-emptylabel=""></select>
+
+                <label for="filter_fruit">Фрукт</label>
+                <select name="fruit" id="filter_fruit" data-filter-emptylabel=""></select>
+
+                <label for="filter_color">Цвет</label>
+                <select name="color" id="filter_color" data-filter-emptylabel=""></select>
+
+                <label for="filter_os">OS</label>
+                <select name="os" id="filter_os" data-filter-emptylabel=""></select>
+
+                <label for="filter_mobile">Mobile</label>
+                <select name="mobile" id="filter_mobile" data-filter-emptylabel=""></select>
+
+                <label for="filter_active">Активен</label>
+                <select name="active" id="filter_active" data-filter-emptylabel=""></select>
+            </div>
+        </form>
+        <ul id="container"></ul>
+        <script src="https://rawgit.com/ChillyBwoy/datafilter/master/javascripts/jquery-1.11.0.min.js"></script>
+        <script src="https://rawgit.com/ChillyBwoy/datafilter/master/javascripts/polyfill.js"></script>
+        <script src="https://rawgit.com/ChillyBwoy/datafilter/master/javascripts/filter.js"></script>
+        <script src="https://rawgit.com/ChillyBwoy/datafilter/master/javascripts/data.js"></script>
+        <script src="https://rawgit.com/ChillyBwoy/datafilter/master/javascripts/application.js"></script>
+    </body>
+</html>
