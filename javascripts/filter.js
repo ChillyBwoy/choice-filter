@@ -24,10 +24,10 @@
                     element.values[name] = format(prop, field.formatter);
                 });
                 return element;
-            });
+            }).toArray();
         }
 
-        function initFilters (fields, data) {
+        function initFilters (fields, data, filterStack) {
             var result = {};
 
             // создаём ключи
@@ -35,14 +35,33 @@
                 result[name] = [];
             });
 
-            $.each(data, function (i, item) {
-                // добавляем в сет только оригинальные значения
-                $.each(item.values, function (name, value) {
-                    if (result[name].indexOf(value) === -1) {
-                        result[name].push(value);
-                    }
+            var unique = function unique (source, dest, except) {
+                $.each(source, function (i, item) {
+                    // добавляем в сет только оригинальные значения
+                    $.each(item.values, function (name, value) {
+                        if (dest[name].indexOf(value) === -1) {
+                            dest[name].push(value);
+                        }
+                    });
                 });
-            });
+            };
+
+            unique(data, result);
+
+            // filterStack.forEach(function (currentFilter) {
+            //     var rest  = filterStack.filter(function (f) { return f.name !== currentFilter.name; }),
+            //         found = search(data, rest);
+
+
+            //     $.each(found, function (i, item) {
+            //         $.each(item.values, function (name, value) {
+            //             if (result[name].indexOf(value) === -1 && name === currentFilter.name) {
+            //                 result[name].push(value);
+            //             }
+            //         });
+            //     });
+            // });
+            
 
             $.each(result, function (name) {
                 // если есть чем сортировать, то сортируем
@@ -78,17 +97,16 @@
             });
         }
 
-        function filterSearch (fields, data, filterStack) {
+        function search (data, filterStack) {
             if (filterStack.length === 0) {
                 return data;
             }
 
-            var currentFilter = filterStack.shift(),
-                results       = $.grep(data, function (item) {
-                                    return (item.values[currentFilter.name] ==
-                                            currentFilter.value);
-                                });
-            return filterSearch(fields, results, filterStack);
+            var filter  = filterStack.shift(),
+                results = data.filter(function (item) {
+                            return (item.values[filter.name] == filter.value);
+                        });
+            return search(results, filterStack);
         }
 
         var Filter = function ($nodes, fields, handler) {
@@ -96,10 +114,11 @@
             this.fields  = fields;
             this.handler = handler || function() {};
 
-            this.data    = initData(fields, $nodes);
-            this.filters = initFilters(fields, this.data);
-
             this.filterStack = [];
+
+            this.data    = initData(fields, $nodes);
+            this.filters = initFilters(fields, this.data, this.filterStack);
+
 
             buildNodes(this.fields, this.filters, this.filterStack);
             this.bindAll();
@@ -138,35 +157,27 @@
                         value = value[0];
                     }
 
-                    var filterIsInStack = $.grep(self.filterStack, function (item) {
+                    var filterIsInStack = self.filterStack.filter(function (item) {
                         return item.name === name;
                     });
 
                     if (value) {
                         if (filterIsInStack.length) {
-                            self.filterStack = $.grep(self.filterStack, function (item) {
-                                return item.name !== name;
-                            });
+                            self.filterStack = self.filterStack.filter(function (item) {
+                                                    return item.name !== name;
+                                                });
                         }
                         self.filterStack.push({'name': name, 'value': value});
                     } else {
-                        self.filterStack = $.grep(self.filterStack, function (item) {
-                            return item.name !== name;
-                        });
+                        self.filterStack = self.filterStack.filter(function (item) {
+                                                return item.name !== name;
+                                            });
                     }
 
-                    var search = filterSearch(fields, self.data.slice(0),
-                                              self.filterStack.slice(0));
+                    var found    = search(self.data.slice(0), self.filterStack.slice(0)),
+                        elements = $.map(found, function (item) { return item.$[0]; });
 
-                    var elements = $.map(search, function (item) {
-                                            return item.$[0];
-                                        });
-
-                    if (search.length) {
-                        self.filters = initFilters(fields, search);
-                    } else {
-                        self.filters = initFilters(fields, self.data);
-                    }
+                    self.filters = initFilters(fields, found, self.filterStack);
 
                     buildNodes(fields, self.filters, self.filterStack);
                     self.handler.call(this, self.filterStack, $(elements),
