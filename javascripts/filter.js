@@ -31,9 +31,6 @@
             var result = {};
 
             // создаём ключи
-            // fields.forEach(function () {
-
-            // });
             $.each(fields, function (name) {
                 result[name] = [];
             });
@@ -81,19 +78,17 @@
             });
         }
 
-        function filterSearch (fields, data, filters, filterStack) {
-
+        function filterSearch (fields, data, filterStack) {
             if (filterStack.length === 0) {
-                return {'data': data, 'filters': filters};
+                return data;
             }
 
             var currentFilter = filterStack.shift(),
                 results       = $.grep(data, function (item) {
                                     return (item.values[currentFilter.name] ==
                                             currentFilter.value);
-                                }),
-                newFilters    = initFilters(fields, results);
-            return filterSearch(fields, results, newFilters, filterStack);
+                                });
+            return filterSearch(fields, results, filterStack);
         }
 
         var Filter = function ($nodes, fields, handler) {
@@ -160,21 +155,20 @@
                         });
                     }
 
-                    var slice = Array.prototype.slice;
-                    var search = filterSearch(fields, slice.call(self.data, 0),
-                                              self.filters,
-                                              slice.call(self.filterStack, 0));
+                    var search = filterSearch(fields, self.data.slice(0),
+                                              self.filterStack.slice(0));
 
-                    var elements = $.map(search.data, function (item) {
-                                        return item.$[0];
-                                    });
+                    var elements = $.map(search, function (item) {
+                                            return item.$[0];
+                                        });
 
-                    if (search.filters.length) {
-                        self.filters = search.filters;
+                    if (search.length) {
+                        self.filters = initFilters(fields, search);
                     } else {
                         self.filters = initFilters(fields, self.data);
                     }
-                    buildNodes(fields, search.filters, self.filterStack);
+
+                    buildNodes(fields, self.filters, self.filterStack);
                     self.handler.call(this, self.filterStack, $(elements),
                                       self.$nodes,
                                       self.filterStack.length === 0);
