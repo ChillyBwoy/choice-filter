@@ -7,19 +7,31 @@
             return f ? f.call(null, v) : v;
         };
 
+        function unique (source, dest) {
+            source.forEach(function (item) {
+                // only unique values
+                $.each(item.values, function (name, value) {
+                    if (dest[name].indexOf(value) === -1) {
+                        dest[name].push(value);
+                    }
+                });
+            });
+            return dest;
+        }
+
         function initData (fields, $nodes) {
             return $nodes.map(function (i, item) {
                 var node    = $(item),
                     element = {
-                        // На всякий пожарный сохраняем DOM-элемент.
+                        // save DOM-element.
                         $:      node,
                         _:      {},
                         values: {}};
 
                 $.each(fields, function (name, field) {
                     var prop = node.data(name);
-                    // Сохраняем в _ оригинальные значения 
-                    // и в values отфоматированные
+                    // _      - original values
+                    // values - formated values
                     element._[name]      = prop;
                     element.values[name] = format(prop, field.formatter);
                 });
@@ -31,7 +43,7 @@
             var result  = {},
                 filters = filterStack.slice(0);
 
-            // создаём ключи
+            // create keys
             $.each(fields, function (name) {
                 result[name] = [];
                 var filterIsInStack = filters.filter(function (item) {
@@ -43,17 +55,7 @@
                 }
             });
 
-            var unique = function unique (source, dest) {
-                source.forEach(function (item) {
-                    // добавляем в сет только оригинальные значения
-                    $.each(item.values, function (name, value) {
-                        if (dest[name].indexOf(value) === -1) {
-                            dest[name].push(value);
-                        }
-                    });
-                });
-            };
-            unique(data, result);
+            result = unique(data, result);
 
 
             filters.forEach(function (currentFilter) {
@@ -63,12 +65,12 @@
                     found = search(data, rest);
 
                 result[currentFilter.name] = [];
-                unique(found, result);
+                result = unique(found, result);
             });
             
 
             $.each(result, function (name) {
-                // если есть чем сортировать, то сортируем
+                // sorting
                 if (fields.hasOwnProperty(name)) {
                     var sorter = fields[name].sorter;
                     if (sorter) {
@@ -114,6 +116,16 @@
             return search(results, filterStack);
         }
 
+        function toCSV (data) {
+            return data.map(function (item) {
+                var res = [];
+                $.each(item.values, function (k, v) {
+                    res.push(v);
+                });
+                return res.join(';');
+            }).join('\n');
+        }
+
         var Filter = function ($nodes, fields, handler) {
             this.$nodes  = $nodes;
             this.fields  = fields;
@@ -124,26 +136,8 @@
             this.data    = initData(fields, $nodes);
             this.filters = initFilters(fields, this.data, this.filterStack);
 
-
             buildNodes(this.fields, this.filters, this.filterStack);
             this.bindAll();
-        };
-
-        Filter.prototype.export = function (format) {
-            var toCSV = function toCSV (data) {
-                return $.map(data, function (item) {
-                            var res = [];
-                            $.each(item._, function (k, v) {
-                                res.push(v);
-                            });
-                            return res.join(';');
-                        }).join('\n');
-            };
-
-            switch(format) {
-                case 'csv':
-                    return toCSV(this.data);
-            }
         };
 
         Filter.prototype.bindAll = function () {
@@ -195,7 +189,6 @@
 
         return Filter;
     }());
-
 
     $.fn.Filter = function (fields, handler) {
         this.filter = new Filter(this, fields, handler);

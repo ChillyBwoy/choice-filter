@@ -1,3 +1,10 @@
+html, body {
+  background: #DDD;
+  margin: 0;
+  padding: 0;
+  font: 12px/14px Arial, sans-serif;
+}
+
 p {
   margin: 0 0 2px 0;
   padding: 0;
@@ -6,7 +13,6 @@ p {
 ul {
   list-style: none;
   padding: 0;
-  font: 12px/14px Arial;
 }
 
 li {
@@ -19,6 +25,34 @@ li {
   width: 12.5%;
 }
 
-select {
-  height: 150px;
+dl {
+  margin: 0;
+  padding: 10px;
+  width: 200px;
+}
+
+dt {
+  display: inline-block;
+  text-align: right;
+  vertical-align: middle;
+  width: 49%;
+}
+
+dd {
+  display: inline-block;
+  margin: 0;
+  padding: 0;
+  vertical-align: top;
+  width: 49%;
+}
+
+
+#logger {
+  border: 5px solid #CCC;
+  font-size: 16px;
+  font-weight: bold;
+  line-height: 14px;
+  margin: 10px;
+  padding: 20px;
+  text-align: center;
 }
