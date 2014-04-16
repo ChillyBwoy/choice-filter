@@ -1,7 +1,6 @@
 (function ($) {
     'use strict';
 
-
     function buildP(key, value) {
         return $('<p/>').text(key + ': ' + value);
     }
@@ -16,7 +15,6 @@
         });
         ul.append(li);
     });
-
 
     // возвращаем строку без пробелов по краям
     var formatFruit = function formatFruit (value) {
@@ -41,12 +39,12 @@
         }
     };
 
-    var sortDateAsc = function sortDateAsc (a, b) {
-        if (a < b) {
-            return 1;
-        } else {
-            return -1;
-        }
+    var sortAsc = function sortAsc (a, b) {
+        return a < b ? 1 : -1;
+    };
+
+    var sortDesc = function sortDesc (a, b) {
+        return a < b ? -1 : 1;
     };
 
     $(function() {
@@ -62,17 +60,16 @@
                 allElements.show();
             } else {
                 allElements.hide();
-                found.show();                
+                found.show();
             }
         };
 
         $('#container li').Filter({
-            'registered': {'$': $('#filter_registered'), 'formatter': formatDate , 'sorter': sortDateAsc},
+            'registered': {'$': $('#filter_registered'), 'formatter': formatDate , 'sorter': sortAsc},
             'gender':     {'$': $('#filter_gender')},
-            'age':        {'$': $('#filter_age')},
+            'age':        {'$': $('#filter_age'), 'sorter': sortDesc},
             'os':         {'$': $('#filter_os')},
             'mobile':     {'$': $('#filter_mobile')},
-            // 'name':       {'$': $('#filter_name'), 'sorter': sortStringAsc},
             'fruit':      {'$': $('#filter_fruit'), 'formatter': formatFruit, 'sorter': sortStringAsc},
             'color':      {'$': $('#filter_color')},
             'active':     {'$': $('#filter_active'), 'formatter': formatActive},

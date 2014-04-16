@@ -28,15 +28,23 @@
         }
 
         function initFilters (fields, data, filterStack) {
-            var result = {};
+            var result  = {},
+                filters = filterStack.slice(0);
 
             // создаём ключи
             $.each(fields, function (name) {
                 result[name] = [];
+                var filterIsInStack = filters.filter(function (item) {
+                    return item.name === name;
+                });
+
+                if (!filterIsInStack.length) {
+                    filters.push({'name': name, 'value': null});
+                }
             });
 
-            var unique = function unique (source, dest, except) {
-                $.each(source, function (i, item) {
+            var unique = function unique (source, dest) {
+                source.forEach(function (item) {
                     // добавляем в сет только оригинальные значения
                     $.each(item.values, function (name, value) {
                         if (dest[name].indexOf(value) === -1) {
@@ -45,22 +53,18 @@
                     });
                 });
             };
-
             unique(data, result);
 
-            // filterStack.forEach(function (currentFilter) {
-            //     var rest  = filterStack.filter(function (f) { return f.name !== currentFilter.name; }),
-            //         found = search(data, rest);
 
+            filters.forEach(function (currentFilter) {
+                var rest  = filters.filter(function (f) {
+                                return f.value && f.name !== currentFilter.name;
+                            }),
+                    found = search(data, rest);
 
-            //     $.each(found, function (i, item) {
-            //         $.each(item.values, function (name, value) {
-            //             if (result[name].indexOf(value) === -1 && name === currentFilter.name) {
-            //                 result[name].push(value);
-            //             }
-            //         });
-            //     });
-            // });
+                result[currentFilter.name] = [];
+                unique(found, result);
+            });
             
 
             $.each(result, function (name) {
@@ -86,7 +90,8 @@
 
                 node.text('');
                 node.append(optionTag('', emptyLabel));
-                $.each(filters[name], function (i, item) {
+
+                filters[name].forEach(function (item) {
                     node.append(optionTag(item, item));
                 });
             });
@@ -177,7 +182,7 @@
                     var found    = search(self.data.slice(0), self.filterStack.slice(0)),
                         elements = $.map(found, function (item) { return item.$[0]; });
 
-                    self.filters = initFilters(fields, found, self.filterStack);
+                    self.filters = initFilters(fields, self.data, self.filterStack);
 
                     buildNodes(fields, self.filters, self.filterStack);
                     self.handler.call(this, self.filterStack, $(elements),
@@ -190,7 +195,6 @@
 
         return Filter;
     }());
-
 
 
     $.fn.Filter = function (fields, handler) {
