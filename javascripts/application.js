@@ -44,28 +44,35 @@
         return a < b ? -1 : 1;
     };
 
+
     $(function() {
 
-        var onFilter = function onFilter(filters, found, allElements, reset) {
+        var onFilter = function onFilter(found, filters, reset) {
+
+            // var elements = $.map(found, function (item) { return item.$; });
+            console.log(found)
+
             $('#logger').text('Found: ' + found.length);
 
-            if (reset) {
-                allElements.show();
-            } else {
-                allElements.hide();
-                found.show();
-            }
+            // if (reset) {
+            //     allElements.show();
+            // } else {
+            //     allElements.hide();
+            //     elements.show();
+            // }
         };
+        // console.log();
 
-        var filter = new DataFilter($('#container li'), {
-            'registered': {'$': $('#filter_registered'), 'formatter': formatDate , 'sorter': sortDate},
-            'gender':     {'$': $('#filter_gender')},
-            'age':        {'$': $('#filter_age'), 'sorter': sortDesc},
-            'os':         {'$': $('#filter_os')},
-            'mobile':     {'$': $('#filter_mobile')},
-            'fruit':      {'$': $('#filter_fruit'), 'formatter': $.trim, 'sorter': sortAsc},
-            'color':      {'$': $('#filter_color')},
-            'active':     {'$': $('#filter_active'), 'formatter': formatActive},
+        
+        var filter = new DataFilter(document.querySelectorAll('#container li'), {
+            'registered': {'formatter': formatDate , 'sorter': sortDate},
+            'gender':     {},
+            'age':        {'sorter': sortDesc},
+            'os':         {},
+            'mobile':     {},
+            'fruit':      {'formatter': $.trim, 'sorter': sortAsc},
+            'color':      {},
+            'active':     {'formatter': formatActive},
         }, onFilter);
 
 
