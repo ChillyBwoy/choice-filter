@@ -46,6 +46,10 @@ dd {
   width: 49%;
 }
 
+select[multiple] {
+  height: 100px;
+}
+
 
 #logger {
   border: 5px solid #CCC;

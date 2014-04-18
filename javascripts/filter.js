@@ -1,25 +1,35 @@
 (function($) {
     'use strict';
 
-    var Filter = (function() {
+    var DataFilter = (function() {
 
-        var format = function format (v, f) {
+        function format (v, f) {
             return f ? f.call(null, v) : v;
-        };
+        }
+
+        function initWithKeysAndArrays (keys) {
+            var dest = {};
+            keys.forEach(function (key) {
+                dest[key] = [];
+            });
+            return dest;
+        }
 
         function unique (source, dest) {
             source.forEach(function (item) {
                 // only unique values
-                $.each(item.values, function (name, value) {
+                for (var name in item.values) {
+                    var value = item.values[name];
                     if (dest[name].indexOf(value) === -1) {
                         dest[name].push(value);
                     }
-                });
+                }
             });
             return dest;
         }
 
         function initData (fields, $nodes) {
+            // TODO: kill jQuery
             return $nodes.map(function (i, item) {
                 var node    = $(item),
                     element = {
@@ -28,38 +38,37 @@
                         _:      {},
                         values: {}};
 
-                $.each(fields, function (name, field) {
-                    var prop = node.data(name);
+                for (var name in fields) {
+                    var field = fields[name],
+                        prop  = node.data(name);
                     // _      - original values
                     // values - formated values
                     element._[name]      = prop;
                     element.values[name] = format(prop, field.formatter);
-                });
+                }
                 return element;
             }).toArray();
         }
 
-        function initFilters (fields, data, filterStack) {
-            var result  = {},
-                filters = filterStack.slice(0);
+        function generateFilters (fields, data, filters) {
+            var result  = initWithKeysAndArrays(Object.keys(fields)),
+                newFilters = filters.slice(0);
 
-            // create keys
+            // TODO: kill jQuery
             $.each(fields, function (name) {
-                result[name] = [];
-                var filterIsInStack = filters.filter(function (item) {
+                var filterIsInStack = newFilters.filter(function (item) {
                     return item.name === name;
                 });
 
                 if (!filterIsInStack.length) {
-                    filters.push({'name': name, 'value': null});
+                    newFilters.push({'name': name, 'value': null});
                 }
             });
 
             result = unique(data, result);
 
-
-            filters.forEach(function (currentFilter) {
-                var rest  = filters.filter(function (f) {
+            newFilters.forEach(function (currentFilter) {
+                var rest  = newFilters.filter(function (f) {
                                 return f.value && f.name !== currentFilter.name;
                             }),
                     found = search(data, rest);
@@ -69,6 +78,7 @@
             });
             
 
+            // TODO: kill jQuery
             $.each(result, function (name) {
                 // sorting
                 if (fields.hasOwnProperty(name)) {
@@ -81,11 +91,12 @@
             return result;
         }
 
-        function buildNodes (fields, filters, filterStack) {
+        function buildNodes (fields, choices, filters) {
             var optionTag = function (value, label) {
                 return $('<option/>').attr('value', value).text(label);
             };
 
+            // TODO: kill jQuery
             $.each(fields, function (name, field) {
                 var node       = field.$,
                     emptyLabel = node.data('filter-emptylabel');
@@ -93,27 +104,29 @@
                 node.text('');
                 node.append(optionTag('', emptyLabel));
 
-                filters[name].forEach(function (item) {
+                choices[name].forEach(function (item) {
                     node.append(optionTag(item, item));
                 });
             });
 
-            $.each(filterStack, function (i, item) {
+            // TODO: kill jQuery
+            $.each(filters, function (i, item) {
                 var node = fields[item.name].$;
                 node.val(item.value);
             });
         }
 
-        function search (data, filterStack) {
-            if (filterStack.length === 0) {
+        function search (data, filters) {
+
+            if (filters.length === 0) {
                 return data;
             }
 
-            var filter  = filterStack.shift(),
+            var filter  = filters.shift(),
                 results = data.filter(function (item) {
                             return (item.values[filter.name] == filter.value);
                         });
-            return search(results, filterStack);
+            return search(results, filters);
         }
 
         function toCSV (data) {
@@ -126,25 +139,27 @@
             }).join('\n');
         }
 
-        var Filter = function ($nodes, fields, handler) {
+        var DataFilter = function ($nodes, fields, handler) {
             this.$nodes  = $nodes;
             this.fields  = fields;
             this.handler = handler || function() {};
 
-            this.filterStack = [];
+            this.filters = [];
 
             this.data    = initData(fields, $nodes);
-            this.filters = initFilters(fields, this.data, this.filterStack);
+            this.choices = generateFilters(fields, this.data, this.filters);
 
-            buildNodes(this.fields, this.filters, this.filterStack);
+            buildNodes(this.fields, this.choices, this.filters);
             this.bindAll();
         };
 
-        Filter.prototype.bindAll = function () {
+
+        DataFilter.prototype.bindAll = function () {
             var self   = this,
                 fields = this.fields;
 
-            $.each(this.filters, function(name) {
+            // TODO: kill jQuery
+            $.each(this.choices, function(name) {
                 var node = fields[name].$;
 
                 node.on('change', function (event) {
@@ -156,43 +171,42 @@
                         value = value[0];
                     }
 
-                    var filterIsInStack = self.filterStack.filter(function (item) {
+                    var filterIsInStack = self.filters.filter(function (item) {
                         return item.name === name;
                     });
 
                     if (value) {
                         if (filterIsInStack.length) {
-                            self.filterStack = self.filterStack.filter(function (item) {
+                            self.filters = self.filters.filter(function (item) {
                                                     return item.name !== name;
                                                 });
                         }
-                        self.filterStack.push({'name': name, 'value': value});
+                        self.filters.push({'name': name, 'value': value});
                     } else {
-                        self.filterStack = self.filterStack.filter(function (item) {
+                        self.filters = self.filters.filter(function (item) {
                                                 return item.name !== name;
                                             });
                     }
 
-                    var found    = search(self.data.slice(0), self.filterStack.slice(0)),
+                    var found    = search(self.data.slice(0), self.filters.slice(0)),
                         elements = $.map(found, function (item) { return item.$[0]; });
 
-                    self.filters = initFilters(fields, self.data, self.filterStack);
+                    self.choices = generateFilters(fields, self.data, self.filters);
 
-                    buildNodes(fields, self.filters, self.filterStack);
-                    self.handler.call(this, self.filterStack, $(elements),
+                    buildNodes(fields, self.choices, self.filters);
+                    self.handler.call(this, self.filters, $(elements),
                                       self.$nodes,
-                                      self.filterStack.length === 0);
+                                      self.filters.length === 0);
                 });
             });
             return this;
         };
 
-        return Filter;
+        return DataFilter;
     }());
 
-    $.fn.Filter = function (fields, handler) {
-        this.filter = new Filter(this, fields, handler);
-        return this;
-    };
+    window.DataFilter = DataFilter;
+
+
 
 }(window.jQuery));

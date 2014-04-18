@@ -18,7 +18,6 @@
 
 
 
-    
     var formatDate = function formatDate (value) {
         var date  = new Date(Date.parse(value)),
             names = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
@@ -46,8 +45,8 @@
     };
 
     $(function() {
-        var onFilter = function onFilter(filters, found, allElements, reset) {
 
+        var onFilter = function onFilter(filters, found, allElements, reset) {
             $('#logger').text('Found: ' + found.length);
 
             if (reset) {
@@ -58,7 +57,7 @@
             }
         };
 
-        $('#container li').Filter({
+        var filter = new DataFilter($('#container li'), {
             'registered': {'$': $('#filter_registered'), 'formatter': formatDate , 'sorter': sortDate},
             'gender':     {'$': $('#filter_gender')},
             'age':        {'$': $('#filter_age'), 'sorter': sortDesc},
@@ -68,6 +67,8 @@
             'color':      {'$': $('#filter_color')},
             'active':     {'$': $('#filter_active'), 'formatter': formatActive},
         }, onFilter);
+
+
     });
 
 
