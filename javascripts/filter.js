@@ -3,6 +3,18 @@
 
     var DataFilter = (function() {
 
+        var debug = {
+            byFieldCount: function (obj) {
+                var res = [];
+                for (var key in obj) {
+                    if (obj.hasOwnProperty(key)) {
+                        res.push(key + ': ' + obj[key].length);
+                    }
+                }
+                return res.join(', ');
+            }
+        }
+
         function format (v, f) {
             return f ? f.call(null, v) : v;
         }
@@ -11,12 +23,42 @@
             return Array.prototype.slice.call(nodeList, 0);
         }
 
-        function createObjectWith(keys, handler) {
+        function objectToArray (obj, handler) {
+            handler = handler || function (k, v) {return {'key': k, 'value': v};};
+            var result = [];
+            for (var key in obj) {
+                if (obj.hasOwnProperty(key)) {
+                    var item = handler.call(null, key, obj[key], obj);
+                    result.push(item);
+                }
+            }
+            return result;
+        }
+
+        function arrayToObject (data, handler) {
+            // handler should return object {'key': '<>', 'value': '<>'}
+            handler = handler || function (x) { return {'key': x.key, 'value': x.value};};
+
+            var result = {};
+            data.forEach(function (item) {
+                var obj = handler.call(null, item);
+                if (!obj.hasOwnProperty('key')) {
+                    throw "Object has no key";
+                }
+                if (!obj.hasOwnProperty('value')) {
+                    throw "Object has no value";
+                }
+                result[obj.key] = obj.value;
+            });
+            return result;
+        }
+
+        function createObjectWith (keys, handler) {
             //if handler wasn't provided, then fill object with null
             handler = handler || function () { return null; };
             var dest = {};
             keys.forEach(function (key, i, _) {
-                dest[key] = handler.call(this, key, i, _);
+                dest[key] = handler.call(null, key, i, _);
             });
             return dest;
         }
@@ -25,13 +67,15 @@
             var dest = {};
             source.forEach(function (item) {
                 for (var name in item) {
-                    var value = item[name];
-                    if (!dest[name]) {
-                        dest[name] = [];
-                    }
-                    if (dest[name].indexOf(value) === -1) {
-                        // add only unique values
-                        dest[name].push(value);
+                    if (item.hasOwnProperty(name)) {
+                        var value = item[name];
+                        if (!dest[name]) {
+                            dest[name] = [];
+                        }
+                        if (dest[name].indexOf(value) === -1) {
+                            // add only unique values
+                            dest[name].push(value);
+                        }
                     }
                 }
             });
@@ -57,33 +101,7 @@
             });
         }
 
-        function createChoices (fields, data, filters) {
-            var result = collectValuesToObject(data);
-
-            // TODO: kill jQuery
-            $.each(fields, function (name) {
-                var filterIsInStack = newFilters.filter(function (item) {
-                    return item.name === name;
-                });
-
-                if (!filterIsInStack.length) {
-                    newFilters.push({'name': name, 'value': null});
-                }
-            });
-
-            
-            // newFilters.forEach(function (currentFilter) {
-            //     var rest  = newFilters.filter(function (f) {
-            //                     return f.value && f.name !== currentFilter.name;
-            //                 }),
-            //         found = search(data, rest);
-
-            //     result[currentFilter.name] = [];
-            //     result = collectValuesToObject(found);
-            // });
-            
-
-            // // TODO: kill jQuery
+        function sortChoices (choices) {
             // $.each(result, function (name) {
             //     // sorting
             //     if (fields.hasOwnProperty(name)) {
@@ -93,18 +111,63 @@
             //         }
             //     }
             // });
+            return choices;
+        }
+
+        function createChoices (data, filters) {
+            var result = collectValuesToObject(data);
+
+            var filterList = objectToArray(filters);
+
+            filterList.forEach(function (filter) {
+                var rest  = filterList.filter(function (f) {
+                                return f.key !== filter.key && f.value !== null;
+                            }),
+                    found = searchData(data, arrayToObject(rest), false);
+
+                result[filter.key] = [];
+                result = collectValuesToObject(found);
+            });
             return result;
         }
 
-        function search (data, filters) {
-            if (filters.length === 0) {
-                return data;
-            }
-            var filter  = filters.shift(),
-                results = data.filter(function (item) {
-                            return (item.values[filter.name] == filter.value);
+        function searchData (data, filters, removeEmpty) {
+            var result = data.slice(0);
+            for (var key in filters) {
+                if (filters.hasOwnProperty(key)) {
+                    var value  = filters[key];
+                    if (removeEmpty) {
+                        if (value !== null) {
+                            result = result.filter(function (item) {
+                                return item[key] == value;
+                            });
+                        }
+                    } else {
+                        result = result.filter(function (item) {
+                            return item[key] == value;
                         });
-            return search(results, filters);
+                    }
+                
+                }
+            }
+            return result;
+
+            // var filterList = objectToArray(filters);
+
+            // if (removeEmpty) {
+            //     filterList = filterList.filter(function (f) {
+            //         return f.value !== null;
+            //     });
+            // }
+
+            // if (filterList.length === 0) {
+            //     return data;
+            // }
+            // var filter = filterList.shift(),
+            //     result = data.filter(function (item) {
+            //                 return (item[filter.key] == filter.value);
+            //             });
+            // return searchData(result, arrayToObject(filterList), removeEmpty);
         }
 
         // function buildNodes (fields, choices, filters) {
@@ -149,20 +212,24 @@
 
 
 
-
-
-
         var DataFilter = function ($nodes, fields, handler) {
             // this.$nodes  = $nodes;
             // this.fields  = fields;
             // this.handler = handler || function() {};
 
             var data    = $DOM2Data(fields, $nodes),
-                filters = createObjectWith(Object.keys(fields)),
-                choices = createChoices(fields, data, filters);
+                filters = createObjectWith(Object.keys(fields));
+                // choices = createChoices(data, filters);
 
-            // console.log(choices);
+            // var filters    = {};
+            filters.age    = '21'
+            filters.mobile = 'Android'
+            filters.fruit  = 'banana'
+            filters.gender = 'female'
 
+            
+            console.log('  Found: ', searchData(data, filters, true).length);
+            console.log('Choices: ', debug.byFieldCount(createChoices(data, filters)));
 
             // this.choices = createChoices(fields, this.data, this.filters);
 
