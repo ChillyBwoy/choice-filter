@@ -47,35 +47,68 @@
 
     $(function() {
 
-        var onFilter = function onFilter(found, filters, reset) {
+        var inputs = {
+            'registered': $('#filter_registered'),
+            'gender':     $('#filter_gender'),
+            'age':        $('#filter_age'),
+            'os':         $('#filter_os'),
+            'mobile':     $('#filter_mobile'),
+            'fruit':      $('#filter_fruit'),
+            'color':      $('#filter_color'),
+            'active':     $('#filter_active')
+        }
 
-            // var elements = $.map(found, function (item) { return item.$; });
-            console.log(found)
+        function handleInputs (choices, filters) {
+            var optionTag = function (value, label) {
+                return $('<option/>').attr('value', value).text(label);
+            };
 
+            $.each(choices, function (name, values) {
+                var node       = inputs[name],
+                    emptyLabel = node.data('filter-emptylabel');
+
+                node.text('');
+                node.append(optionTag('', emptyLabel));
+
+                values.forEach(function (item) {
+                    node.append(optionTag(item, item));
+                });
+            });
+
+            $.each(filters, function (name, item) {
+                var node = inputs[name];
+                node.val(item);
+            });
+        }
+
+        var filterHandler = function filterHandler(found, choices, filters) {
             $('#logger').text('Found: ' + found.length);
-
-            // if (reset) {
-            //     allElements.show();
-            // } else {
-            //     allElements.hide();
-            //     elements.show();
-            // }
+            handleInputs(choices, filters);
         };
-        // console.log();
 
-        
-        var filter = new DataFilter(document.querySelectorAll('#container li'), {
-            'registered': {'formatter': formatDate , 'sorter': sortDate},
+        var fields = {
+            'registered': {'formatter': formatDate, 'sorter': sortDate},
             'gender':     {},
             'age':        {'sorter': sortDesc},
             'os':         {},
             'mobile':     {},
             'fruit':      {'formatter': $.trim, 'sorter': sortAsc},
             'color':      {},
-            'active':     {'formatter': formatActive},
-        }, onFilter);
+            'active':     {'formatter': formatActive}
+        };
 
 
+        var $nodes  = document.querySelectorAll('#container li'),
+            filters = DataFilter.initFilters(fields),
+            data    = DataFilter.$DOM2Data(fields, $nodes);
+
+        // filters.age    = '21';
+        // filters.mobile = 'iOS';
+        // filters.fruit  = 'banana';
+        // filters.gender = 'female';
+        // filters.active = 'Yes';
+
+        var found = DataFilter.filter(data, filters, filterHandler);
     });
 
 

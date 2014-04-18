@@ -3,16 +3,18 @@
 
     var DataFilter = (function() {
 
-        var debug = {
-            byFieldCount: function (obj) {
-                var res = [];
-                for (var key in obj) {
-                    if (obj.hasOwnProperty(key)) {
-                        res.push(key + ': ' + obj[key].length);
+        function toCSV (data, delimiter) {
+            delimiter = delimiter || ';';
+            var rows = data.map(function (item) {
+                var colls = [];
+                for (var coll in item) {
+                    if (item.hasOwnProperty(coll)) {
+                        colls.push(item[coll]);
                     }
                 }
-                return res.join(', ');
-            }
+                return colls.join(delimiter);
+            });
+            return rows.join('\n');
         }
 
         function format (v, f) {
@@ -43,10 +45,10 @@
             data.forEach(function (item) {
                 var obj = handler.call(null, item);
                 if (!obj.hasOwnProperty('key')) {
-                    throw "Object has no key";
+                    throw 'Object has no key';
                 }
                 if (!obj.hasOwnProperty('value')) {
-                    throw "Object has no value";
+                    throw 'Object has no value';
                 }
                 result[obj.key] = obj.value;
             });
@@ -101,7 +103,7 @@
             });
         }
 
-        function sortChoices (choices) {
+        function sortChoices (choices, fields) {
             // $.each(result, function (name) {
             //     // sorting
             //     if (fields.hasOwnProperty(name)) {
@@ -115,20 +117,25 @@
         }
 
         function createChoices (data, filters) {
-            var result = collectValuesToObject(data);
-
-            var filterList = objectToArray(filters);
+            var result     = collectValuesToObject(data),
+                filterList = objectToArray(filters);
 
             filterList.forEach(function (filter) {
-                var rest  = filterList.filter(function (f) {
+                var rest    = filterList.filter(function (f) {
                                 return f.key !== filter.key && f.value !== null;
                             }),
-                    found = searchData(data, arrayToObject(rest), false);
+                    found   = searchData(data, arrayToObject(rest), false),
+                    current = collectValuesToObject(found);
 
-                result[filter.key] = [];
-                result = collectValuesToObject(found);
+                result[filter.key] = current[filter.key];
             });
             return result;
+        }
+
+        function filterItems (data, key, value) {
+            return data.filter(function (item) {
+                return item[key] == value;
+            });
         }
 
         function searchData (data, filters, removeEmpty) {
@@ -138,158 +145,84 @@
                     var value  = filters[key];
                     if (removeEmpty) {
                         if (value !== null) {
-                            result = result.filter(function (item) {
-                                return item[key] == value;
-                            });
+                            result = filterItems(result, key, value);
                         }
                     } else {
-                        result = result.filter(function (item) {
-                            return item[key] == value;
-                        });
+                        result = filterItems(result, key, value);
                     }
-                
                 }
             }
             return result;
-
-            // var filterList = objectToArray(filters);
-
-            // if (removeEmpty) {
-            //     filterList = filterList.filter(function (f) {
-            //         return f.value !== null;
-            //     });
-            // }
-
-            // if (filterList.length === 0) {
-            //     return data;
-            // }
-            // var filter = filterList.shift(),
-            //     result = data.filter(function (item) {
-            //                 return (item[filter.key] == filter.value);
-            //             });
-            // return searchData(result, arrayToObject(filterList), removeEmpty);
         }
 
-        // function buildNodes (fields, choices, filters) {
-        //     var optionTag = function (value, label) {
-        //         return $('<option/>').attr('value', value).text(label);
-        //     };
+        function filter (data, filters, handler) {
+            handler = handler || function () {};
+            var found   = searchData(data, filters, true),
+                choices = createChoices(data, filters);
+
+            handler.call(null, found, choices, filters);
+
+            return {
+                'data':    found,
+                'choices': choices
+            };
+        }
+
+        function initFilters (fields) {
+            return createObjectWith(Object.keys(fields));
+        }
+
+
+        // DataFilter.prototype.bindAll = function () {
+        //     var self   = this,
+        //         fields = this.fields;
 
         //     // TODO: kill jQuery
-        //     $.each(fields, function (name, field) {
-        //         var node       = field.$,
-        //             emptyLabel = node.data('filter-emptylabel');
+        //     $.each(this.choices, function(name) {
+        //         var node = fields[name].$;
 
-        //         node.text('');
-        //         node.append(optionTag('', emptyLabel));
+        //         node.on('change', function (event) {
+        //             event.preventDefault();
 
-        //         choices[name].forEach(function (item) {
-        //             node.append(optionTag(item, item));
+        //             var value = node.val();
+
+        //             var filterIsInStack = self.filters.filter(function (item) {
+        //                 return item.name === name;
+        //             });
+
+        //             if (value) {
+        //                 if (filterIsInStack.length) {
+        //                     self.filters = self.filters.filter(function (item) {
+        //                                             return item.name !== name;
+        //                                         });
+        //                 }
+        //                 self.filters.push({'name': name, 'value': value});
+        //             } else {
+        //                 self.filters = self.filters.filter(function (item) {
+        //                                         return item.name !== name;
+        //                                     });
+        //             }
+
+        //             var found    = search(self.data.slice(0), self.filters.slice(0));
+
+        //             self.choices = createChoices(fields, self.data, self.filters);
+        //             // buildNodes(fields, self.choices, self.filters);
+        //             self.handler.call(this, found, self.filters, self.filters.length === 0);
         //         });
         //     });
+        //     return this;
+        // };
 
-        //     // TODO: kill jQuery
-        //     $.each(filters, function (i, item) {
-        //         var node = fields[item.name].$;
-        //         node.val(item.value);
-        //     });
-        // }
+        // return DataFilter;
 
-
-
-
-
-        // function toCSV (data) {
-        //     return data.map(function (item) {
-        //         var res = [];
-        //         $.each(item.values, function (k, v) {
-        //             res.push(v);
-        //         });
-        //         return res.join(';');
-        //     }).join('\n');
-        // }
-
-
-
-
-        var DataFilter = function ($nodes, fields, handler) {
-            // this.$nodes  = $nodes;
-            // this.fields  = fields;
-            // this.handler = handler || function() {};
-
-            var data    = $DOM2Data(fields, $nodes),
-                filters = createObjectWith(Object.keys(fields));
-                // choices = createChoices(data, filters);
-
-            // var filters    = {};
-            filters.age    = '21'
-            filters.mobile = 'Android'
-            filters.fruit  = 'banana'
-            filters.gender = 'female'
-
-            
-            console.log('  Found: ', searchData(data, filters, true).length);
-            console.log('Choices: ', debug.byFieldCount(createChoices(data, filters)));
-
-            // this.choices = createChoices(fields, this.data, this.filters);
-
-            // buildNodes(this.fields, this.choices, this.filters);
-
-            // this.bindAll();
+        return {
+            'initFilters': initFilters,
+            'filter':      filter,
+            '$DOM2Data':   $DOM2Data,
+            'export': {
+                'toCSV': toCSV
+            }
         };
-
-
-
-
-
-
-
-
-        DataFilter.prototype.bindAll = function () {
-            var self   = this,
-                fields = this.fields;
-
-            // TODO: kill jQuery
-            $.each(this.choices, function(name) {
-                var node = fields[name].$;
-
-                node.on('change', function (event) {
-                    event.preventDefault();
-
-                    var value  = node.val();
-
-                    if (value instanceof Array) {
-                        value = value[0];
-                    }
-
-                    var filterIsInStack = self.filters.filter(function (item) {
-                        return item.name === name;
-                    });
-
-                    if (value) {
-                        if (filterIsInStack.length) {
-                            self.filters = self.filters.filter(function (item) {
-                                                    return item.name !== name;
-                                                });
-                        }
-                        self.filters.push({'name': name, 'value': value});
-                    } else {
-                        self.filters = self.filters.filter(function (item) {
-                                                return item.name !== name;
-                                            });
-                    }
-
-                    var found    = search(self.data.slice(0), self.filters.slice(0));
-
-                    self.choices = createChoices(fields, self.data, self.filters);
-                    // buildNodes(fields, self.choices, self.filters);
-                    self.handler.call(this, found, self.filters, self.filters.length === 0);
-                });
-            });
-            return this;
-        };
-
-        return DataFilter;
     }());
 
     window.DataFilter = DataFilter;
