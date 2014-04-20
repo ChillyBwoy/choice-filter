@@ -8,8 +8,8 @@
             var rows = data.map(function (item) {
                 var colls = [];
                 for (var coll in item) {
-                    if (item.hasOwnProperty(coll)) {
-                        colls.push(item[coll]);
+                    if (item.attrs.hasOwnProperty(coll)) {
+                        colls.push(item.attrs[coll]);
                     }
                 }
                 return colls.join(delimiter);
@@ -68,15 +68,15 @@
         function collectValuesToObject (source) {
             var dest = {};
             source.forEach(function (item) {
-                for (var name in item) {
-                    if (item.hasOwnProperty(name)) {
-                        var value = item[name];
-                        if (!dest[name]) {
-                            dest[name] = [];
+                for (var key in item.attrs) {
+                    if (item.attrs.hasOwnProperty(key)) {
+                        var value = item.attrs[key];
+                        if (!dest[key]) {
+                            dest[key] = [];
                         }
-                        if (dest[name].indexOf(value) === -1) {
+                        if (dest[key].indexOf(value) === -1) {
                             // add only unique values
-                            dest[name].push(value);
+                            dest[key].push(value);
                         }
                     }
                 }
@@ -86,9 +86,10 @@
 
         function $DOMNodeData (node, fields, handleValue) {
             handleValue = handleValue || function (x) { return x; };
-            var obj = {};
+            var obj = {'attrs': {}, '$':node};
+
             fields.forEach(function (field) {
-                obj[field] = handleValue(node.getAttribute('data-' + field), field);
+                obj.attrs[field] = handleValue(node.getAttribute('data-' + field), field);
             });
             return obj;
         }
@@ -126,7 +127,6 @@
                             }),
                     found   = searchData(data, arrayToObject(rest), false),
                     current = collectValuesToObject(found);
-
                 result[filter.key] = current[filter.key];
             });
             return result;
@@ -134,7 +134,7 @@
 
         function filterItems (data, key, value) {
             return data.filter(function (item) {
-                return item[key] == value;
+                return item.attrs[key] == value;
             });
         }
 
@@ -171,49 +171,6 @@
         function initFilters (fields) {
             return createObjectWith(Object.keys(fields));
         }
-
-
-        // DataFilter.prototype.bindAll = function () {
-        //     var self   = this,
-        //         fields = this.fields;
-
-        //     // TODO: kill jQuery
-        //     $.each(this.choices, function(name) {
-        //         var node = fields[name].$;
-
-        //         node.on('change', function (event) {
-        //             event.preventDefault();
-
-        //             var value = node.val();
-
-        //             var filterIsInStack = self.filters.filter(function (item) {
-        //                 return item.name === name;
-        //             });
-
-        //             if (value) {
-        //                 if (filterIsInStack.length) {
-        //                     self.filters = self.filters.filter(function (item) {
-        //                                             return item.name !== name;
-        //                                         });
-        //                 }
-        //                 self.filters.push({'name': name, 'value': value});
-        //             } else {
-        //                 self.filters = self.filters.filter(function (item) {
-        //                                         return item.name !== name;
-        //                                     });
-        //             }
-
-        //             var found    = search(self.data.slice(0), self.filters.slice(0));
-
-        //             self.choices = createChoices(fields, self.data, self.filters);
-        //             // buildNodes(fields, self.choices, self.filters);
-        //             self.handler.call(this, found, self.filters, self.filters.length === 0);
-        //         });
-        //     });
-        //     return this;
-        // };
-
-        // return DataFilter;
 
         return {
             'initFilters': initFilters,

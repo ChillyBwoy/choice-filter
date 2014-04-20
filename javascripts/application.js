@@ -48,15 +48,52 @@
     $(function() {
 
         var inputs = {
-            'registered': $('#filter_registered'),
-            'gender':     $('#filter_gender'),
-            'age':        $('#filter_age'),
-            'os':         $('#filter_os'),
-            'mobile':     $('#filter_mobile'),
-            'fruit':      $('#filter_fruit'),
-            'color':      $('#filter_color'),
-            'active':     $('#filter_active')
-        }
+                'registered': $('#filter_registered'),
+                'gender':     $('#filter_gender'),
+                'age':        $('#filter_age'),
+                'os':         $('#filter_os'),
+                'mobile':     $('#filter_mobile'),
+                'fruit':      $('#filter_fruit'),
+                'color':      $('#filter_color'),
+                'active':     $('#filter_active')
+            },
+            fields = {
+                'registered': {'formatter': formatDate, 'sorter': sortDate},
+                'gender':     {},
+                'age':        {'sorter': sortDesc},
+                'os':         {},
+                'mobile':     {},
+                'fruit':      {'formatter': $.trim, 'sorter': sortAsc},
+                'color':      {},
+                'active':     {'formatter': formatActive}
+            },
+            $nodes  = document.querySelectorAll('#container li'),
+            filters = DataFilter.initFilters(fields),
+            data    = DataFilter.$DOM2Data(fields, $nodes);
+
+
+        $.each(inputs, function (name, input) {
+            input.on('change', function (event) {
+                event.preventDefault();
+                var value = input.val();
+                if (value) {
+                    filters[name] = value;
+                } else {
+                    filters[name] = null;
+                }
+                DataFilter.filter(data, filters, filterHandler);
+            });
+        });
+
+        function filterHandler(found, choices, filters) {
+            $('#container li').hide();
+            $('#logger').text('Found: ' + found.length);
+
+            $nodes = found.map(function (item) { return item.$; });
+            $($nodes).show();
+
+            handleInputs(choices, filters);
+        };
 
         function handleInputs (choices, filters) {
             var optionTag = function (value, label) {
@@ -81,34 +118,7 @@
             });
         }
 
-        var filterHandler = function filterHandler(found, choices, filters) {
-            $('#logger').text('Found: ' + found.length);
-            handleInputs(choices, filters);
-        };
-
-        var fields = {
-            'registered': {'formatter': formatDate, 'sorter': sortDate},
-            'gender':     {},
-            'age':        {'sorter': sortDesc},
-            'os':         {},
-            'mobile':     {},
-            'fruit':      {'formatter': $.trim, 'sorter': sortAsc},
-            'color':      {},
-            'active':     {'formatter': formatActive}
-        };
-
-
-        var $nodes  = document.querySelectorAll('#container li'),
-            filters = DataFilter.initFilters(fields),
-            data    = DataFilter.$DOM2Data(fields, $nodes);
-
-        // filters.age    = '21';
-        // filters.mobile = 'iOS';
-        // filters.fruit  = 'banana';
-        // filters.gender = 'female';
-        // filters.active = 'Yes';
-
-        var found = DataFilter.filter(data, filters, filterHandler);
+        DataFilter.filter(data, filters, filterHandler);
     });
 
 

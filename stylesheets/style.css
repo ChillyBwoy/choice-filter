@@ -13,16 +13,17 @@ p {
 ul {
   list-style: none;
   padding: 0;
-  width: 600px;
-  height: 620px;
-  margin: 0 auto;
-  overflow-y: scroll;
+  /*width: 600px;*/
+  /*height: 620px;*/
+  /*margin: 0 auto;*/
+  /*overflow-y: scroll;*/
 }
 
 li {
   border-bottom: 1px solid #000;
   display: inline-block;
-  width: 25%;
+  /*width: 25%;*/
+  width: 12.5%;
   vertical-align: top;
   padding: 5px 0;
 }
