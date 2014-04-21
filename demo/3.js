@@ -74,52 +74,57 @@
             filters = DataFilter.initFilters(fields),
             data    = DataFilter.$DOM2Data(fields, $nodes);
 
-        function bindSelects () {
-            $.each(inputs, function (name, input) {
-                input.on('change', function (event) {
-                    event.preventDefault();
-                    var value = input.val();
-                    if (value) {
-                        filters[name] = value;
-                    } else {
-                        filters[name] = null;
-                    }
-                    DataFilter.filter(data, filters, fields, filterHandler);
-                });
+        function choiceTag (key, value, label) {
+            var a = $('<a/>').text(label)
+                             .attr('href', '#')
+                             .attr('data-key-name', key)
+                             .attr('data-key-value', value),
+                li = $('<li/>');
+
+            if (value == filters[key]) {
+                li.addClass('selected');
+            }
+
+            a.click(function (event) {
+                event.preventDefault();
+                var node  = $(this),
+                    name  = node.data('key-name'),
+                    value = node.data('key-value');
+                if (!value) {
+                    value = null;
+                }
+                filters[name] = value;
+                DataFilter.filter(data, filters, fields, filterHandler);
             });
+            return li.append(a);
         }
 
-        function optionTag (value, label) {
-            return $('<option/>').attr('value', value).text(label);
-        }
-
-        function fillSelect (select, values) {
-            select.text('');
-            select.append(optionTag('', '---'));
+        function fillUl (name, ul, values) {
+            ul.text('');
+            ul.append(choiceTag(name, '', '---'));
 
             values.forEach(function (item) {
-                select.append(optionTag(item, item));
+                ul.append(choiceTag(name, item, item));
             });
         }
 
         function filterHandler(found, choices, filters) {
-            $('#logger').text('Found: ' + found.length);
             $nodes.hide();
 
             var $foundNodes = found.map(function (item) { return item.$; });
             $($foundNodes).show();
 
-            $.each(choices, function (name, values) {
-                fillSelect(inputs[name], values);
+            $('#logger').text('');
+            $.each(filters, function (key, value) {
+                $('#logger').append($('<span>' + key + '</span>: <strong>' + (value ? value : '---') + '</strong>'));
             });
 
-            $.each(filters, function (name, item) {
-                var node = inputs[name];
-                node.val(item);
+            $.each(choices, function (name, values) {
+                fillUl(name, inputs[name], values);
             });
         };
 
-        bindSelects();
+        
         DataFilter.filter(data, filters, fields, filterHandler);
     });
 
