@@ -1,198 +1,185 @@
-(function($) {
+(function() {
     'use strict';
 
-    var Filter = (function() {
+    var DataFilter = (function() {
 
-        var format = function format (v, f) {
+        function toCSV (data, delimiter) {
+            delimiter = delimiter || ';';
+            var rows = data.map(function (item) {
+                var colls = [];
+                for (var coll in item) {
+                    if (item.attrs.hasOwnProperty(coll)) {
+                        colls.push(item.attrs[coll]);
+                    }
+                }
+                return colls.join(delimiter);
+            });
+            return rows.join('\n');
+        }
+
+        function format (v, f) {
             return f ? f.call(null, v) : v;
-        };
-
-        function unique (source, dest) {
-            source.forEach(function (item) {
-                // only unique values
-                $.each(item.values, function (name, value) {
-                    if (dest[name].indexOf(value) === -1) {
-                        dest[name].push(value);
-                    }
-                });
-            });
-            return dest;
         }
 
-        function initData (fields, $nodes) {
-            return $nodes.map(function (i, item) {
-                var node    = $(item),
-                    element = {
-                        // save DOM-element.
-                        $:      node,
-                        _:      {},
-                        values: {}};
-
-                $.each(fields, function (name, field) {
-                    var prop = node.data(name);
-                    // _      - original values
-                    // values - formated values
-                    element._[name]      = prop;
-                    element.values[name] = format(prop, field.formatter);
-                });
-                return element;
-            }).toArray();
+        function toArray (nodeList) {
+            return Array.prototype.slice.call(nodeList, 0);
         }
 
-        function initFilters (fields, data, filterStack) {
-            var result  = {},
-                filters = filterStack.slice(0);
-
-            // create keys
-            $.each(fields, function (name) {
-                result[name] = [];
-                var filterIsInStack = filters.filter(function (item) {
-                    return item.name === name;
-                });
-
-                if (!filterIsInStack.length) {
-                    filters.push({'name': name, 'value': null});
+        function objectToArray (obj, handler) {
+            handler = handler || function (k, v) {return {'key': k, 'value': v};};
+            var result = [];
+            for (var key in obj) {
+                if (obj.hasOwnProperty(key)) {
+                    var item = handler.call(null, key, obj[key], obj);
+                    result.push(item);
                 }
-            });
+            }
+            return result;
+        }
 
-            result = unique(data, result);
+        function arrayToObject (data, handler) {
+            // handler should return object {'key': '<>', 'value': '<>'}
+            handler = handler || function (x) { return {'key': x.key, 'value': x.value};};
 
-
-            filters.forEach(function (currentFilter) {
-                var rest  = filters.filter(function (f) {
-                                return f.value && f.name !== currentFilter.name;
-                            }),
-                    found = search(data, rest);
-
-                result[currentFilter.name] = [];
-                result = unique(found, result);
-            });
-            
-
-            $.each(result, function (name) {
-                // sorting
-                if (fields.hasOwnProperty(name)) {
-                    var sorter = fields[name].sorter;
-                    if (sorter) {
-                        result[name].sort(sorter);
-                    }
+            var result = {};
+            data.forEach(function (item) {
+                var obj = handler.call(null, item);
+                if (!obj.hasOwnProperty('key')) {
+                    throw 'Object has no key';
                 }
+                if (!obj.hasOwnProperty('value')) {
+                    throw 'Object has no value';
+                }
+                result[obj.key] = obj.value;
             });
             return result;
         }
 
-        function buildNodes (fields, filters, filterStack) {
-            var optionTag = function (value, label) {
-                return $('<option/>').attr('value', value).text(label);
-            };
-
-            $.each(fields, function (name, field) {
-                var node       = field.$,
-                    emptyLabel = node.data('filter-emptylabel');
-
-                node.text('');
-                node.append(optionTag('', emptyLabel));
-
-                filters[name].forEach(function (item) {
-                    node.append(optionTag(item, item));
-                });
+        function createObjectWith (keys, handler) {
+            //if handler wasn't provided, then fill object with null
+            handler = handler || function () { return null; };
+            var dest = {};
+            keys.forEach(function (key, i, _) {
+                dest[key] = handler.call(null, key, i, _);
             });
-
-            $.each(filterStack, function (i, item) {
-                var node = fields[item.name].$;
-                node.val(item.value);
-            });
+            return dest;
         }
 
-        function search (data, filterStack) {
-            if (filterStack.length === 0) {
-                return data;
-            }
-
-            var filter  = filterStack.shift(),
-                results = data.filter(function (item) {
-                            return (item.values[filter.name] == filter.value);
-                        });
-            return search(results, filterStack);
-        }
-
-        function toCSV (data) {
-            return data.map(function (item) {
-                var res = [];
-                $.each(item.values, function (k, v) {
-                    res.push(v);
-                });
-                return res.join(';');
-            }).join('\n');
-        }
-
-        var Filter = function ($nodes, fields, handler) {
-            this.$nodes  = $nodes;
-            this.fields  = fields;
-            this.handler = handler || function() {};
-
-            this.filterStack = [];
-
-            this.data    = initData(fields, $nodes);
-            this.filters = initFilters(fields, this.data, this.filterStack);
-
-            buildNodes(this.fields, this.filters, this.filterStack);
-            this.bindAll();
-        };
-
-        Filter.prototype.bindAll = function () {
-            var self   = this,
-                fields = this.fields;
-
-            $.each(this.filters, function(name) {
-                var node = fields[name].$;
-
-                node.on('change', function (event) {
-                    event.preventDefault();
-
-                    var value  = node.val();
-
-                    if (value instanceof Array) {
-                        value = value[0];
-                    }
-
-                    var filterIsInStack = self.filterStack.filter(function (item) {
-                        return item.name === name;
-                    });
-
-                    if (value) {
-                        if (filterIsInStack.length) {
-                            self.filterStack = self.filterStack.filter(function (item) {
-                                                    return item.name !== name;
-                                                });
+        function collectValuesToObject (source) {
+            var dest = {};
+            source.forEach(function (item) {
+                for (var key in item.attrs) {
+                    if (item.attrs.hasOwnProperty(key)) {
+                        var value = item.attrs[key];
+                        if (!dest[key]) {
+                            dest[key] = [];
                         }
-                        self.filterStack.push({'name': name, 'value': value});
-                    } else {
-                        self.filterStack = self.filterStack.filter(function (item) {
-                                                return item.name !== name;
-                                            });
+                        if (dest[key].indexOf(value) === -1) {
+                            // add only unique values
+                            dest[key].push(value);
+                        }
                     }
+                }
+            });
+            return dest;
+        }
 
-                    var found    = search(self.data.slice(0), self.filterStack.slice(0)),
-                        elements = $.map(found, function (item) { return item.$[0]; });
+        function $DOMNodeData (node, fields, handleValue) {
+            handleValue = handleValue || function (x) { return x; };
+            var obj = {'attrs': {}, '$':node};
 
-                    self.filters = initFilters(fields, self.data, self.filterStack);
+            fields.forEach(function (field) {
+                obj.attrs[field] = handleValue(node.getAttribute('data-' + field), field);
+            });
+            return obj;
+        }
 
-                    buildNodes(fields, self.filters, self.filterStack);
-                    self.handler.call(this, self.filterStack, $(elements),
-                                      self.$nodes,
-                                      self.filterStack.length === 0);
+        function $DOM2Data (fields, nodes) {
+            var nodeList = toArray(nodes);
+
+            return nodeList.map(function (node) {
+                return $DOMNodeData(node, Object.keys(fields), function (value, field) {
+                    return format(value, fields[field].formatter);
                 });
             });
-            return this;
-        };
+        }
 
-        return Filter;
+        function createChoices (data, filters, fields) {
+            var result     = collectValuesToObject(data),
+                filterList = objectToArray(filters);
+
+            filterList.forEach(function (filter) {
+                var rest    = filterList.filter(function (f) {
+                                return f.key !== filter.key && f.value !== null;
+                            }),
+                    found   = searchData(data, arrayToObject(rest), fields, false),
+                    current = collectValuesToObject(found);
+                result[filter.key] = current[filter.key];
+            });
+
+            for (var key in fields) {
+                if (fields.hasOwnProperty(key)) {
+                    var sorter = fields[key].sorter;
+                    if (sorter) {
+                        result[key].sort(sorter);
+                    }
+                }
+            }
+            return result;
+        }
+
+        function filterItems (data, key, value) {
+            return data.filter(function (item) {
+                return item.attrs[key] == value;
+            });
+        }
+
+        function searchData (data, filters, fields, removeEmpty) {
+            var result = data.slice(0);
+            for (var key in filters) {
+                if (filters.hasOwnProperty(key)) {
+                    var value  = filters[key];
+                    if (removeEmpty) {
+                        if (value !== null) {
+                            result = filterItems(result, key, value);
+                        }
+                    } else {
+                        result = filterItems(result, key, value);
+                    }
+                }
+            }
+            return result;
+        }
+
+        function filter (data, filters, fields, handler) {
+            handler = handler || function () {};
+            var found   = searchData(data, filters, fields, true),
+                choices = createChoices(data, filters, fields);
+
+            handler.call(null, found, choices, filters);
+
+            return {
+                'data':    found,
+                'choices': choices
+            };
+        }
+
+        function initFilters (fields) {
+            return createObjectWith(Object.keys(fields));
+        }
+
+        return {
+            'initFilters': initFilters,
+            'filter':      filter,
+            '$DOM2Data':   $DOM2Data,
+            'export': {
+                'toCSV': toCSV
+            }
+        };
     }());
 
-    $.fn.Filter = function (fields, handler) {
-        this.filter = new Filter(this, fields, handler);
-        return this;
-    };
+    window.DataFilter = DataFilter;
 
-}(window.jQuery));
+
+
+}());

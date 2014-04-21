@@ -6,7 +6,6 @@
             return new Date(Date.parse(value.slice(0, 3) + ' 1, ' + value.slice(5)));
         };
 
-
         // format functions 
         var formatDate = function formatDate (value) {
             var date  = new Date(Date.parse(value)),
@@ -33,18 +32,7 @@
 
         var filters, data;
 
-        var inputs = {
-                'registered': $('#filter_registered'),
-                'gender':     $('#filter_gender'),
-                'age':        $('#filter_age'),
-                'os':         $('#filter_os'),
-                'mobile':     $('#filter_mobile'),
-                'state':      $('#filter_state'),
-                'fruit':      $('#filter_fruit'),
-                'color':      $('#filter_color'),
-                'active':     $('#filter_active'),
-            },
-            fields = {
+        var fields = {
                 'registered': {'formatter': formatDate, 'sorter': sortDate},
                 'gender':     {},
                 'age':        {'sorter': sortDesc},
@@ -86,61 +74,37 @@
             }
         }
 
-        var ul = $('#container');
-        $.each(window.testData, function(i, item) {
-            var li = $('<li/>');
-            li.css({'background-color': item.color});
-            $.each(item, function (key, value) {
-                li.append(buildP(key, value));
-                li.attr('data-' + key, value);
-            });
-            ul.append(li);
-        });
+        function buildNodes () {
+            var ul = $('#container');
+            $.each(window.testData, function(i, item) {
+                var li = $('<li/>');
+                li.css({'background-color': item.color});
+                $.each(item, function (key, value) {
+                    li.append(buildP(key, value));
+                    li.attr('data-' + key, value);
+                });
+                ul.append(li);
+            });            
+        }
 
-        var $nodes  = document.querySelectorAll('#container li');
+        buildNodes();
+
+        var $nodes  = $('#container li');
 
         filters = DataFilter.initFilters(fields);
         data    = DataFilter.$DOM2Data(fields, $nodes);
 
-        $.each(inputs, function (name, input) {
-            input.on('change', function (event) {
-                event.preventDefault();
-                var value = input.val();
-                if (value) {
-                    filters[name] = value;
-                } else {
-                    filters[name] = null;
-                }
-                DataFilter.filter(data, filters, fields, filterHandler);
-            });
-        });
 
         function filterHandler(found, choices, filters) {
-            $('#container li').hide();
-            $('#logger').text('Found: ' + found.length);
+            $nodes.hide();
+            var $foundNodes = found.map(function (item) { return item.$; });
+            $($foundNodes).show();
 
-            $nodes = found.map(function (item) { return item.$; });
-            $($nodes).show();
-
-            var optionTag = function (value, label) {
-                return $('<option/>').attr('value', value).text(label);
-            };
-
-            $.each(choices, function (name, values) {
-                var node = inputs[name];
-
-                node.text('');
-                node.append(optionTag('', '---'));
-
-                values.forEach(function (item) {
-                    node.append(optionTag(item, item));
-                });
+            $('#logger').text('');
+            $.each(filters, function (key, value) {
+                $('#logger').append($('<p/>').text(key + ': ' + (value ? value : '---')));
             });
-
-            $.each(filters, function (name, item) {
-                var node = inputs[name];
-                node.val(item);
-            });
+            
         };
 
         DataFilter.filter(data, filters, fields, filterHandler);
