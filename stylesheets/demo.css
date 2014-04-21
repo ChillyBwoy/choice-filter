@@ -1,0 +1,81 @@
+html, body {
+  background: #DDD;
+  margin: 0;
+  padding: 0;
+  font: 12px/14px Arial, sans-serif;
+}
+
+p {
+  margin: 0 0 2px 0;
+  padding: 0;
+}
+
+ul {
+  list-style: none;
+  padding: 0;
+}
+
+.list-data li {
+  border: 1px solid #333;
+  box-sizing: border-box;
+  display: inline-block;
+  width: 12.5%;
+  vertical-align: top;
+  padding: 5px 0;
+}
+  .list-data li p {
+    padding: 0 5px;
+  }
+
+    .list-data li p span,
+    .list-data li p em,
+    .list-data li p a {
+      display: inline-block;
+      vertical-align: top;
+      width: 50%;
+    }
+
+    .list-data li p a {
+      color: #000;
+      font-weight: bold;
+    }
+
+    .list-data li p span {
+      text-align: right;
+    }
+
+
+.list-filter {
+  display: inline-block;
+  width: 10%;
+  vertical-align: top;
+  margin-bottom: 50px;
+}
+
+  .list-filter li {}
+
+    .list-filter li a {}
+
+      .list-filter li.selected {
+        background: #FFF;
+        font-weight: bold;
+      }
+
+
+form {
+  text-align: center;
+}
+
+select[multiple] {
+  height: 100px;
+}
+
+
+#logger {
+  border: 5px solid #CCC;
+  font-size: 16px;
+  font-weight: bold;
+  line-height: 14px;
+  margin: 10px;
+  padding: 5px;
+}
