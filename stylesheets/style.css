@@ -27,9 +27,26 @@ li {
   vertical-align: top;
   padding: 5px 0;
 }
-li p {
-  padding: 0 5px;
-}
+
+  li p {
+    padding: 0 5px;
+  }
+
+    li p span,
+    li p a {
+      display: inline-block;
+      vertical-align: top;
+      width: 50%;
+    }
+
+    li p a {
+      color: #000;
+      font-weight: bold;
+    }
+
+    li p span {
+      text-align: right;
+    }
 
 form {
   text-align: center;
