@@ -17,7 +17,6 @@
     });
 
 
-
     var formatDate = function formatDate (value) {
         var date  = new Date(Date.parse(value)),
             names = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
@@ -37,11 +36,11 @@
     };
 
     var sortAsc = function sortAsc (a, b) {
-        return a < b ? 1 : -1;
+        return a < b ? -1 : 1;
     };
 
     var sortDesc = function sortDesc (a, b) {
-        return a < b ? -1 : 1;
+        return a < b ? 1 : -1;
     };
 
 
@@ -81,7 +80,7 @@
                 } else {
                     filters[name] = null;
                 }
-                DataFilter.filter(data, filters, filterHandler);
+                DataFilter.filter(data, filters, fields, filterHandler);
             });
         });
 
@@ -92,10 +91,6 @@
             $nodes = found.map(function (item) { return item.$; });
             $($nodes).show();
 
-            handleInputs(choices, filters);
-        };
-
-        function handleInputs (choices, filters) {
             var optionTag = function (value, label) {
                 return $('<option/>').attr('value', value).text(label);
             };
@@ -116,9 +111,9 @@
                 var node = inputs[name];
                 node.val(item);
             });
-        }
+        };
 
-        DataFilter.filter(data, filters, filterHandler);
+        DataFilter.filter(data, filters, fields, filterHandler);
     });
 
 

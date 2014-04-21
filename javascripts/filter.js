@@ -104,20 +104,7 @@
             });
         }
 
-        function sortChoices (choices, fields) {
-            // $.each(result, function (name) {
-            //     // sorting
-            //     if (fields.hasOwnProperty(name)) {
-            //         var sorter = fields[name].sorter;
-            //         if (sorter) {
-            //             result[name].sort(sorter);
-            //         }
-            //     }
-            // });
-            return choices;
-        }
-
-        function createChoices (data, filters) {
+        function createChoices (data, filters, fields) {
             var result     = collectValuesToObject(data),
                 filterList = objectToArray(filters);
 
@@ -125,10 +112,19 @@
                 var rest    = filterList.filter(function (f) {
                                 return f.key !== filter.key && f.value !== null;
                             }),
-                    found   = searchData(data, arrayToObject(rest), false),
+                    found   = searchData(data, arrayToObject(rest), fields, false),
                     current = collectValuesToObject(found);
                 result[filter.key] = current[filter.key];
             });
+
+            for (var key in fields) {
+                if (fields.hasOwnProperty(key)) {
+                    var sorter = fields[key].sorter;
+                    if (sorter) {
+                        result[key].sort(sorter);
+                    }
+                }
+            }
             return result;
         }
 
@@ -138,7 +134,7 @@
             });
         }
 
-        function searchData (data, filters, removeEmpty) {
+        function searchData (data, filters, fields, removeEmpty) {
             var result = data.slice(0);
             for (var key in filters) {
                 if (filters.hasOwnProperty(key)) {
@@ -155,10 +151,10 @@
             return result;
         }
 
-        function filter (data, filters, handler) {
+        function filter (data, filters, fields, handler) {
             handler = handler || function () {};
-            var found   = searchData(data, filters, true),
-                choices = createChoices(data, filters);
+            var found   = searchData(data, filters, fields, true),
+                choices = createChoices(data, filters, fields);
 
             handler.call(null, found, choices, filters);
 
