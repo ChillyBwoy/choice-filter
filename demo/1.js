@@ -1,11 +1,26 @@
 (function ($) {
     'use strict';
 
-    $(function() {
+    $(function () {
+
+        function buildNodes () {
+            var ul = $('#container');
+            $.each(window.testData, function(i, item) {
+                var li = $('<li/>');
+                li.css({'background-color': item.color});
+                $.each(item, function (key, value) {
+                    li.append($('<p/>').text(key + ': ' + value));
+                    li.attr('data-' + key, value);
+                });
+                ul.append(li);
+            });
+        }
+        buildNodes();
+
+        
         var parseDate = function parseDate (value) {
             return new Date(Date.parse(value.slice(0, 3) + ' 1, ' + value.slice(5)));
         };
-
 
         // format functions 
         var formatDate = function formatDate (value) {
@@ -31,7 +46,6 @@
             return a < b ? 1 : -1;
         };
 
-        var filters, data;
 
         var inputs = {
                 'registered': $('#filter_registered'),
@@ -56,85 +70,46 @@
                 'active':     {'formatter': formatActive}
             };
 
+        var $nodes  = $('#container li'),
+            filters = DataFilter.initFilters(fields),
+            data    = DataFilter.$DOM2Data(fields, $nodes);
 
-        function buildP(key, value) {
-            var p = $('<p/>'),
-                s = $('<span/>').text(key + ': ');
-
-            if (fields.hasOwnProperty(key)) {
-                var a = $('<a/>').attr('href', '#')
-                                 .attr('data-key-name', key)
-                                 .attr('data-key-value', value)
-                                 .text(value);
-                a.click(function (event) {
+        function bindSelects () {
+            $.each(inputs, function (name, input) {
+                input.on('change', function (event) {
                     event.preventDefault();
-                    var node  = $(this),
-                        name  = node.data('key-name'),
-                        value = node.data('key-value');
-
-                    if (fields[name].formatter) {
-                        value = fields[name].formatter(value);
+                    var value = input.val();
+                    if (value) {
+                        filters[name] = value;
+                    } else {
+                        filters[name] = null;
                     }
-
-                    filters[name] = value;
                     DataFilter.filter(data, filters, fields, filterHandler);
-                    
                 });
-                return p.append(s).append(a);
-            } else {
-                return p.append(s).append($('<em/>').text(value));
-            }
+            });
         }
 
-        var ul = $('#container');
-        $.each(window.testData, function(i, item) {
-            var li = $('<li/>');
-            li.css({'background-color': item.color});
-            $.each(item, function (key, value) {
-                li.append(buildP(key, value));
-                li.attr('data-' + key, value);
+        function optionTag (value, label) {
+            return $('<option/>').attr('value', value).text(label);
+        }
+
+        function fillSelect (select, values) {
+            select.text('');
+            select.append(optionTag('', '---'));
+
+            values.forEach(function (item) {
+                select.append(optionTag(item, item));
             });
-            ul.append(li);
-        });
-
-        var $nodes  = document.querySelectorAll('#container li');
-
-        filters = DataFilter.initFilters(fields);
-        data    = DataFilter.$DOM2Data(fields, $nodes);
-
-        $.each(inputs, function (name, input) {
-            input.on('change', function (event) {
-                event.preventDefault();
-                var value = input.val();
-                if (value) {
-                    filters[name] = value;
-                } else {
-                    filters[name] = null;
-                }
-                DataFilter.filter(data, filters, fields, filterHandler);
-            });
-        });
+        }
 
         function filterHandler(found, choices, filters) {
-            $('#container li').hide();
-            $('#logger').text('Found: ' + found.length);
+            $nodes.hide();
 
-            $nodes = found.map(function (item) { return item.$; });
-            $($nodes).show();
-
-            var optionTag = function (value, label) {
-                return $('<option/>').attr('value', value).text(label);
-            };
+            var $foundNodes = found.map(function (item) { return item.$; });
+            $($foundNodes).show();
 
             $.each(choices, function (name, values) {
-                var node = inputs[name];
-
-                node.text('');
-                node.append(optionTag('', '---'));
-
-                values.forEach(function (item) {
-                    node.append(optionTag(item, item));
-                });
+                fillSelect(inputs[name], values);
             });
 
             $.each(filters, function (name, item) {
@@ -143,6 +118,7 @@
             });
         };
 
+        bindSelects();
         DataFilter.filter(data, filters, fields, filterHandler);
     });
 
