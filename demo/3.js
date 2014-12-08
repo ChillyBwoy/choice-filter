@@ -122,7 +122,7 @@
             $.each(choices, function (name, values) {
                 fillUl(name, inputs[name], values);
             });
-        };
+        }
 
         
         DataFilter.filter(data, filters, fields, filterHandler);

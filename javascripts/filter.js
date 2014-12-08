@@ -15,7 +15,7 @@
         }
 
         function format(v, f) {
-            return f ? f.call(null, v) : v;
+            return f ? f.call(f, v) : v;
         }
 
         function toArray(nodeList) {
@@ -25,7 +25,7 @@
         function objectToArray(obj, handler) {
             handler = handler || function (k, v) { return {'key': k, 'value': v}; };
             return Object.keys(obj).map(function (key) {
-                return handler.call(null, key, obj[key], obj);
+                return handler.call(handler, key, obj[key], obj);
             });
         }
 
@@ -33,45 +33,43 @@
             // handler should return object {'key': '<>', 'value': '<>'}
             handler = handler || function (x) { return {'key': x.key, 'value': x.value}; };
 
-            var result = {};
-            data.forEach(function (item) {
-                var obj = handler.call(null, item);
+            return data.reduce(function(prev, curr) {
+                var obj = handler.call(handler, curr);
                 if (!obj.hasOwnProperty('key')) {
-                    throw 'Object has no key';
+                    throw new Error('Object has no key');
                 }
                 if (!obj.hasOwnProperty('value')) {
-                    throw 'Object has no value';
+                    throw new Error('Object has no value');
                 }
-                result[obj.key] = obj.value;
-            });
-            return result;
+                prev[obj.key] = obj.value;
+                return prev;
+            }, {});
         }
 
         function createObjectWith(keys, handler) {
             //if handler wasn't provided, then fill object with null
             handler = handler || function () { return null; };
-            var dest = {};
-            keys.forEach(function (key) {
-                dest[key] = handler.call(null, Array.prototype.slice.call(arguments));
-            });
-            return dest;
+
+            return keys.reduce(function(prev, curr) {
+                prev[curr] = handler.call(handler, Array.prototype.slice.call(arguments));
+                return prev;
+            }, {});
         }
 
         function collectValuesToObject(source) {
-            var dest = {};
-            source.forEach(function (item) {
-                Object.keys(item.attrs).forEach(function (key) {
-                    var value = item.attrs[key];
-                    if (!dest[key]) {
-                        dest[key] = [];
+            return source.reduce(function(prev, curr) {
+                Object.keys(curr.attrs).forEach(function (key) {
+                    var value = curr.attrs[key];
+                    if (!(key in prev)) {
+                        prev[key] = [];
                     }
-                    if (dest[key].indexOf(value) === -1) {
+                    if (prev[key].indexOf(value) === -1) {
                         // add only unique values
-                        dest[key].push(value);
+                        prev[key].push(value);
                     }
                 });
-            });
-            return dest;
+                return prev;
+            }, {});
         }
 
         function $DOMNodeData(node, fields, handleValue) {
@@ -141,7 +139,7 @@
             var found   = searchData(data, filters, true),
                 choices = createChoices(data, filters, fields);
 
-            handler.call(null, found, choices, filters);
+            handler.call(handler, found, choices, filters);
 
             return {
                 'data':    found,
