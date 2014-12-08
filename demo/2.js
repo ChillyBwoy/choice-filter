@@ -105,7 +105,7 @@
                 $('#logger').append($('<p/>').text(key + ': ' + (value ? value : '---')));
             });
             
-        };
+        }
 
         DataFilter.filter(data, filters, fields, filterHandler);
     });
