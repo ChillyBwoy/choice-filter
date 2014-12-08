@@ -117,7 +117,7 @@
                 var node = inputs[name];
                 node.val(item);
             });
-        };
+        }
 
         bindSelects();
         DataFilter.filter(data, filters, fields, filterHandler);

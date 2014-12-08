@@ -1,92 +1,80 @@
-(function() {
+(function ($window) {
     'use strict';
 
-    var DataFilter = (function() {
+    var DataFilter = (function () {
 
-        function toCSV (data, delimiter) {
+        function toCSV(data, delimiter) {
             delimiter = delimiter || ';';
-            var rows = data.map(function (item) {
-                var colls = [];
-                for (var coll in item) {
-                    if (item.attrs.hasOwnProperty(coll)) {
-                        colls.push(item.attrs[coll]);
-                    }
-                }
+            var rows = data.map(function (row) {
+                var colls = Object.keys(row).map(function (key) {
+                    return row.attrs[key];
+                });
                 return colls.join(delimiter);
             });
             return rows.join('\n');
         }
 
-        function format (v, f) {
-            return f ? f.call(null, v) : v;
+        function format(v, f) {
+            return f ? f.call(f, v) : v;
         }
 
-        function toArray (nodeList) {
+        function toArray(nodeList) {
             return Array.prototype.slice.call(nodeList, 0);
         }
 
-        function objectToArray (obj, handler) {
-            handler = handler || function (k, v) {return {'key': k, 'value': v};};
-            var result = [];
-            for (var key in obj) {
-                if (obj.hasOwnProperty(key)) {
-                    var item = handler.call(null, key, obj[key], obj);
-                    result.push(item);
-                }
-            }
-            return result;
+        function objectToArray(obj, handler) {
+            handler = handler || function (k, v) { return {'key': k, 'value': v}; };
+            return Object.keys(obj).map(function (key) {
+                return handler.call(handler, key, obj[key], obj);
+            });
         }
 
-        function arrayToObject (data, handler) {
+        function arrayToObject(data, handler) {
             // handler should return object {'key': '<>', 'value': '<>'}
-            handler = handler || function (x) { return {'key': x.key, 'value': x.value};};
+            handler = handler || function (x) { return {'key': x.key, 'value': x.value}; };
 
-            var result = {};
-            data.forEach(function (item) {
-                var obj = handler.call(null, item);
+            return data.reduce(function(prev, curr) {
+                var obj = handler.call(handler, curr);
                 if (!obj.hasOwnProperty('key')) {
-                    throw 'Object has no key';
+                    throw new Error('Object has no key');
                 }
                 if (!obj.hasOwnProperty('value')) {
-                    throw 'Object has no value';
+                    throw new Error('Object has no value');
                 }
-                result[obj.key] = obj.value;
-            });
-            return result;
+                prev[obj.key] = obj.value;
+                return prev;
+            }, {});
         }
 
-        function createObjectWith (keys, handler) {
+        function createObjectWith(keys, handler) {
             //if handler wasn't provided, then fill object with null
             handler = handler || function () { return null; };
-            var dest = {};
-            keys.forEach(function (key, i, _) {
-                dest[key] = handler.call(null, key, i, _);
-            });
-            return dest;
+
+            return keys.reduce(function(prev, curr) {
+                prev[curr] = handler.call(handler, Array.prototype.slice.call(arguments));
+                return prev;
+            }, {});
         }
 
-        function collectValuesToObject (source) {
-            var dest = {};
-            source.forEach(function (item) {
-                for (var key in item.attrs) {
-                    if (item.attrs.hasOwnProperty(key)) {
-                        var value = item.attrs[key];
-                        if (!dest[key]) {
-                            dest[key] = [];
-                        }
-                        if (dest[key].indexOf(value) === -1) {
-                            // add only unique values
-                            dest[key].push(value);
-                        }
+        function collectValuesToObject(source) {
+            return source.reduce(function(prev, curr) {
+                Object.keys(curr.attrs).forEach(function (key) {
+                    var value = curr.attrs[key];
+                    if (!(key in prev)) {
+                        prev[key] = [];
                     }
-                }
-            });
-            return dest;
+                    if (prev[key].indexOf(value) === -1) {
+                        // add only unique values
+                        prev[key].push(value);
+                    }
+                });
+                return prev;
+            }, {});
         }
 
-        function $DOMNodeData (node, fields, handleValue) {
+        function $DOMNodeData(node, fields, handleValue) {
             handleValue = handleValue || function (x) { return x; };
-            var obj = {'attrs': {}, '$':node};
+            var obj = {'attrs': {}, '$': node};
 
             fields.forEach(function (field) {
                 obj.attrs[field] = handleValue(node.getAttribute('data-' + field), field);
@@ -94,7 +82,7 @@
             return obj;
         }
 
-        function $DOM2Data (fields, nodes) {
+        function $DOM2Data(fields, nodes) {
             var nodeList = toArray(nodes);
 
             return nodeList.map(function (node) {
@@ -104,59 +92,54 @@
             });
         }
 
-        function createChoices (data, filters, fields) {
-            var result     = collectValuesToObject(data),
-                filterList = objectToArray(filters);
-
-            filterList.forEach(function (filter) {
-                var rest    = filterList.filter(function (f) {
-                                return f.key !== filter.key && f.value !== null;
-                            }),
-                    found   = searchData(data, arrayToObject(rest), fields, false),
-                    current = collectValuesToObject(found);
-                result[filter.key] = current[filter.key];
-            });
-
-            for (var key in fields) {
-                if (fields.hasOwnProperty(key)) {
-                    var sorter = fields[key].sorter;
-                    if (sorter) {
-                        result[key].sort(sorter);
-                    }
-                }
-            }
-            return result;
-        }
-
-        function filterItems (data, key, value) {
+        function filterItems(data, key, value) {
             return data.filter(function (item) {
                 return item.attrs[key] == value;
             });
         }
 
-        function searchData (data, filters, fields, removeEmpty) {
+        function searchData(data, filters, removeEmpty) {
             var result = data.slice(0);
-            for (var key in filters) {
-                if (filters.hasOwnProperty(key)) {
-                    var value  = filters[key];
-                    if (removeEmpty) {
-                        if (value !== null) {
-                            result = filterItems(result, key, value);
-                        }
-                    } else {
+
+            Object.keys(filters).forEach(function (key) {
+                var value = filters[key];
+                if (removeEmpty) {
+                    if (value !== null) {
                         result = filterItems(result, key, value);
                     }
+                } else {
+                    result = filterItems(result, key, value);
                 }
-            }
+            });
             return result;
         }
 
-        function filter (data, filters, fields, handler) {
-            handler = handler || function () {};
-            var found   = searchData(data, filters, fields, true),
+        function createChoices(data, filters, fields) {
+            var result     = collectValuesToObject(data),
+                filterList = objectToArray(filters);
+
+            filterList.forEach(function (filter) {
+                var rest    = filterList.filter(function (f) { return f.key !== filter.key && f.value !== null; }),
+                    found   = searchData(data, arrayToObject(rest), false),
+                    current = collectValuesToObject(found);
+                result[filter.key] = current[filter.key];
+            });
+
+            Object.keys(fields).forEach(function (key) {
+                var sorter = fields[key].sorter;
+                if (sorter) {
+                    result[key].sort(sorter);
+                }
+            });
+            return result;
+        }
+
+        function filter(data, filters, fields, handler) {
+            handler = handler || function () { return; };
+            var found   = searchData(data, filters, true),
                 choices = createChoices(data, filters, fields);
 
-            handler.call(null, found, choices, filters);
+            handler.call(handler, found, choices, filters);
 
             return {
                 'data':    found,
@@ -164,7 +147,7 @@
             };
         }
 
-        function initFilters (fields) {
+        function initFilters(fields) {
             return createObjectWith(Object.keys(fields));
         }
 
@@ -178,8 +161,6 @@
         };
     }());
 
-    window.DataFilter = DataFilter;
+    $window.DataFilter = DataFilter;
 
-
-
-}());
+}(this));
