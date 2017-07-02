@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>test</title>
+  <meta charset="utf-8">
+  <style>
+    html, body {
+      height: 100%;
+      padding: 0;
+      margin: 0;
+    }
+
+    body {
+      font-family: Arial, "Helvetica Neue", Helvetica, sans-serif;
+      font-size: 12px;
+    }
+
+    table {
+      width: 100%;
+    }
+
+    td {
+      padding: 3px;
+      border: 1px inset #000;
+    }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/systemjs/0.20.14/system.js"></script>
+  <script>
+    SystemJS.config({
+      defaultExtension: 'js',
+      map: {
+        'react': './node_modules/react/dist/react.min.js',
+        'react-dom': './node_modules/react-dom/dist/react-dom.min.js'
+      }
+    });
+    SystemJS.import('/dist/index.js');
+  </script>
+</body>
+</html>
