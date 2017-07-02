@@ -1,14 +1,20 @@
 {
-  "name": "datafilter-packages",
-  "private": true,
+  "name": "@chillybwoy/datafilter",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
-  "scripts": {},
+  "main": "dist/filter.js",
+  "types": "dist/filter.d.ts",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/ChillyBwoy/datafilter.git"
   },
+  "scripts": {
+    "build": "./node_modules/.bin/tsc -p .",
+    "watch": "./node_modules/.bin/tsc -p . --watch"
+  },
+  "files": [
+    "dist"
+  ],
   "author": "Eugene Cheltsov <chill.icp@gmail.com>",
   "license": "MIT",
   "bugs": {
@@ -16,6 +22,6 @@
   },
   "homepage": "https://github.com/ChillyBwoy/datafilter#readme",
   "devDependencies": {
-    "lerna": "^2.0.0-rc.5"
+    "typescript": "^2.4.1"
   }
 }

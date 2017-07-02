@@ -1,20 +1,23 @@
-import React from "react";
-import ReactDOM from "react-dom";
+import * as React from "react";
+import * as ReactDOM from "react-dom";
 
-import { dataFilter } from "./filter.js";
-import { FilterTable } from "./components/Table.js";
+import dataFilter, { DataFilterFields } from "@chillybwoy/datafilter";
+
+import FilterTable from "./components/FilterTable";
 import { Person } from "./types";
 
 fetch('/data/people.json')
   .then(r => r.json())
   .then(json => {
-    const fields = {
+    const fields: DataFilterFields<Person> = {
       isActive: {
         format(value: boolean) {
           return value ? "yes" : "no"
         }
       },
-      age: {},
+      age: {
+        ignore: true
+      },
       firstName: {
         ignore: true
       },
@@ -32,6 +35,10 @@ fetch('/data/people.json')
       os: {},
       fruit: {},
       tags: {
+        match(item, value) {
+          const s = this.serialize ? this.serialize(item) : "";
+          return s === value;
+        },
         format(value: string[]) {
           return value.join(", ");
         },

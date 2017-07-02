@@ -137,7 +137,7 @@ function createChoices<T extends DataFilterMap<any>>(
   return choices;
 }
 
-export function dataFilter<T>(fields: DataFilterFields<T>) {
+export default function dataFilter<T>(fields: DataFilterFields<T>) {
   const dispatch: DataFilter<T> = (data, payload) => {
     return {
       data: filterItems(data, fields, payload),
