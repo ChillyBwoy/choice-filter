@@ -1,4 +1,5 @@
-import React, { PureComponent } from "react";
+import * as React from "react";
+import { PureComponent } from "react";
 import { DataFilterFields } from "@chillybwoy/datafilter";
 
 import {
@@ -20,10 +21,10 @@ class FilterTableItem extends PureComponent<FilterTableItemProps, {}> {
 
     return (
       <tr>
-        {Object.keys(fields).map((f: keyof Person) => {
+        {Object.keys(fields).map((f: keyof Person, i) => {
           return fields[f]!.format
-            ? (<td>{fields[f]!.format!(data[f], data)}</td>)
-            : (<td>{data[f]}</td>)
+            ? (<td key={i}>{fields[f]!.format!(data[f], data)}</td>)
+            : (<td key={i}>{data[f]}</td>)
         })}
       </tr>
     );

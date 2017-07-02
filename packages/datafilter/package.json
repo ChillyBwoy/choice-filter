@@ -2,8 +2,8 @@
   "name": "@chillybwoy/datafilter",
   "version": "1.0.0",
   "description": "",
-  "main": "./dist/filter.ts",
-  "types": "./dist/filter.dts",
+  "main": "dist/filter.js",
+  "types": "dist/filter.d.ts",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/ChillyBwoy/datafilter.git"
@@ -13,7 +13,7 @@
     "watch": "./node_modules/.bin/tsc -p . --watch"
   },
   "files": [
-    "./dist"
+    "dist"
   ],
   "author": "Eugene Cheltsov <chill.icp@gmail.com>",
   "license": "MIT",
