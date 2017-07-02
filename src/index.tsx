@@ -5,12 +5,6 @@ import { dataFilter } from "./filter.js";
 import { FilterTable } from "./components/Table.js";
 import { Person } from "./types";
 
-// const f = filter.filter({
-//   gender: "male",
-//   fruit: "apple"
-// });
-
-
 fetch('/data/people.json')
   .then(r => r.json())
   .then(json => {
@@ -41,7 +35,7 @@ fetch('/data/people.json')
         format(value: string[]) {
           return value.join(", ");
         },
-        serialize(list: any[], index: number) {
+        serialize(list: any[]) {
           return list.slice(0).sort().join("|");
         }
       }

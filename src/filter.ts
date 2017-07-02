@@ -1,6 +1,10 @@
-export interface DataFilterMap<T> {
+export type DataFilterMap<T> = {
   [key: string]: T;
 }
+
+export type DataFilterFields<T> = Partial<Record<keyof T, DataFilterField<T>>>;
+export type DataFilterChoices = DataFilterMap<any[]>;
+export type DataFilterPayload = DataFilterMap<any[]>;
 
 export interface DataFilterField<T> {
   name?: string;
@@ -10,16 +14,10 @@ export interface DataFilterField<T> {
   ignore?: boolean;
 }
 
-export type DataFilterFields<T> = Partial<Record<keyof T, DataFilterField<T>>>;
-
-export type DataFilterChoices = DataFilterMap<any>;
-
 export interface DataFilter<T> {
   (data: T[], payload: DataFilterMap<any>): {
     data: T[];
-    choices: {
-      [key: string]: any[]
-    }
+    choices: DataFilterChoices
   }
 }
 
@@ -104,7 +102,6 @@ function filterItems<T extends DataFilterMap<any>>(
       if (value === undefined) {
         return true;
       }
-
       if (field && field.match) {
         return field.match(item[pk], value);
       }

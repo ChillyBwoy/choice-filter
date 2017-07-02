@@ -2,7 +2,6 @@ import React from "react";
 
 import { Person } from "../types";
 import {
-  dataFilter,
   DataFilter,
   DataFilterFields,
 } from "../filter";
@@ -19,12 +18,6 @@ export interface FilterTableState {}
 export class FilterTable extends React.Component<FilterTableProps, FilterTableState> {
   renderTh(fields: any, key: string, choices?: string[]) {
     const field = fields[key];
-    // if (field && field.name) {
-    //   return (
-    //     <th>{field.name}</th>
-    //   )
-    // }
-
     return (
       <th>
         <div>{key}</div>

@@ -9,7 +9,7 @@
     "url": "git+https://github.com/ChillyBwoy/datafilter.git"
   },
   "author": "Eugene Cheltsov <chill.icp@gmail.com>",
-  "license": "ISC",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/ChillyBwoy/datafilter/issues"
   },
