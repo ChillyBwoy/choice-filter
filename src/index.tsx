@@ -21,12 +21,18 @@ fetch('/data/people.json')
         }
       },
       age: {},
-      firstName: {},
-      lastName: {},
+      firstName: {
+        ignore: true
+      },
+      lastName: {
+        ignore: true
+      },
       gender: {},
       state: {},
       city: {},
-      registeredAt: {},
+      registeredAt: {
+        ignore: true
+      },
       color: {},
       mobile: {},
       os: {},
@@ -34,6 +40,9 @@ fetch('/data/people.json')
       tags: {
         format(value: string[]) {
           return value.join(", ");
+        },
+        serialize(list: any[], index: number) {
+          return list.slice(0).sort().join("|");
         }
       }
     };

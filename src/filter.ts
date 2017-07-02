@@ -3,8 +3,11 @@ export interface DataFilterMap<T> {
 }
 
 export interface DataFilterField<T> {
+  name?: string;
   format?: (value: any, row: T) => any;
   match?: (item: T, value: any) => boolean;
+  serialize?: (item: any, index?: number) => string;
+  ignore?: boolean;
 }
 
 export type DataFilterFields<T> = Partial<Record<keyof T, DataFilterField<T>>>;
@@ -20,23 +23,39 @@ export interface DataFilter<T> {
   }
 }
 
-function dataToObject<T extends DataFilterMap<any>>(data: T[]) {
-  const result: DataFilterMap<any> = {};
-  for (const item of data) {
-    const keys = Object.keys(item);
+function getAllowedFiled<T>(fields: DataFilterFields<T>) {
+  const keys = Object.keys(fields);
+  return keys.filter(key => {
+    const field = fields[key];
 
+    if (field && field.ignore) {
+      return !field.ignore;
+    }
+    return true;
+  });
+}
+
+function dataToObject<T extends DataFilterMap<any>>(data: T[], fields: DataFilterFields<T>) {
+  const result: DataFilterMap<any> = {};
+  const keys = getAllowedFiled<T>(fields);
+
+  data.forEach((item, i) => {
     keys.forEach(key => {
       if (!result[key]) {
         result[key] = [null];
       }
 
+      const field = fields[key];
       const value = item[key];
+      const uniqueValue = field && field.serialize
+        ? field.serialize(value, i)
+        : value;
 
-      if (result[key].indexOf(value) === -1) {
-        result[key].push(value);
+      if (result[key].indexOf(uniqueValue) === -1) {
+        result[key].push(uniqueValue);
       }
     });
-  }
+  });
   return result;
 }
 
@@ -53,14 +72,15 @@ export function dataFilter<T extends {[key: string]: any}>(fields: DataFilterFie
       }
     }
 
-    const choices: DataFilterChoices = dataToObject(input);
+    let choices: DataFilterChoices = dataToObject(input, fields);
+    let data = input.slice();
 
-    const data = input.slice().filter(item => {
-      // iterate through all keys
-      const success = keys.filter(pk => {
-        const value = payload[pk];
-        const field = fields[pk];
+    for (const pk of keys) {
+      const field = fields[pk];
+      const value = payload[pk];
 
+      data = data.filter(item => {
+        // if no value then allow it
         if (value === undefined) {
           return true;
         }
@@ -72,8 +92,9 @@ export function dataFilter<T extends {[key: string]: any}>(fields: DataFilterFie
         return item[pk] === value;
       });
 
-      return success.length === size;
-    });
+      choices = dataToObject(data, fields);
+    }
+
 
     return {
       choices,

@@ -28,18 +28,26 @@ export class FilterTable extends React.Component<FilterTableProps, FilterTableSt
       choices,
       data,
     } = filter(input, {
-      color: "#445569",
-      mobile: "iOS",
-      fruit: "Apple"
+      // color: "#54D1F1",
+      // mobile: "iOS",
+      // fruit: "Apple",
+      // os: "OS X"
     });
-
-    console.log(choices);
-    console.log(data);
 
     return (
       <table>
         <thead>
-
+          {Object.keys(fields).map(f => {
+            const field = fields[f];
+            if (field && field.name) {
+              return (
+                <th>{field.name}</th>
+              )
+            }
+            return (
+              <th>{f}</th>
+            )
+          })}
         </thead>
         <tbody>
           {data.map(d => (
