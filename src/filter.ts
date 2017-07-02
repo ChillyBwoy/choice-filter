@@ -23,6 +23,35 @@ export interface DataFilter<T> {
   }
 }
 
+export interface DataFilterPick {
+  key: string;
+  value: any;
+}
+
+/**
+ * Pick keys from the first argument and values from the second,
+ * combine them and fold to an array;
+ * @param keysFrom keys source
+ * @param valuesFrom values source
+ */
+function pickObjectsToArray(keysFrom: any, valuesFrom: any): DataFilterPick[] {
+  const keys = Object.keys(keysFrom);
+
+  return keys.map(key => {
+    return {
+      key,
+      value: valuesFrom[key]
+    };
+  });
+}
+
+function pickArrayToObject(data: DataFilterPick[]) {
+  return data.reduce((acc: DataFilterMap<any>, curr) => {
+    acc[curr.key] = curr.value;
+    return acc;
+  }, {});
+}
+
 function getAllowedFiled<T>(fields: DataFilterFields<T>) {
   const keys = Object.keys(fields);
   return keys.filter(key => {
@@ -35,14 +64,14 @@ function getAllowedFiled<T>(fields: DataFilterFields<T>) {
   });
 }
 
-function dataToObject<T extends DataFilterMap<any>>(data: T[], fields: DataFilterFields<T>) {
+function collectValues<T extends DataFilterMap<any>>(data: T[], fields: DataFilterFields<T>) {
   const result: DataFilterMap<any> = {};
   const keys = getAllowedFiled<T>(fields);
 
   data.forEach((item, i) => {
     keys.forEach(key => {
       if (!result[key]) {
-        result[key] = [null];
+        result[key] = [];
       }
 
       const field = fields[key];
@@ -59,48 +88,64 @@ function dataToObject<T extends DataFilterMap<any>>(data: T[], fields: DataFilte
   return result;
 }
 
-export function dataFilter<T extends {[key: string]: any}>(fields: DataFilterFields<T>) {
+function filterItems<T extends DataFilterMap<any>>(
+    data: T[],
+    fields: DataFilterFields<T>,
+    payload: DataFilterMap<any>) {
+
   const keys = Object.keys(fields);
   const size = keys.length;
 
-  const dispatch: DataFilter<T> = (input, payload) => {
-    const payloadKeys = Object.keys(payload);
-
-    for (const pk of payloadKeys) {
-      if (keys.indexOf(pk) === -1) {
-        throw new Error(`Key "${pk}" is not allowed`);
-      }
-    }
-
-    let choices: DataFilterChoices = dataToObject(input, fields);
-    let data = input.slice();
-
-    for (const pk of keys) {
+  return data.filter(item => {
+    const success = keys.filter(pk => {
       const field = fields[pk];
       const value = payload[pk];
 
-      data = data.filter(item => {
-        // if no value then allow it
-        if (value === undefined) {
-          return true;
-        }
+      if (value === undefined) {
+        return true;
+      }
 
-        if (field && field.match) {
-          return field.match(item[pk], value);
-        }
+      if (field && field.match) {
+        return field.match(item[pk], value);
+      }
 
-        return item[pk] === value;
-      });
+      return item[pk] === value;
+    });
 
-      choices = dataToObject(data, fields);
-    }
+    return success.length === size;
+  });
+}
 
+function createChoices<T extends DataFilterMap<any>>(
+    data: T[],
+    fields: DataFilterFields<T>,
+    payload: DataFilterMap<any>) {
+  const initialChoices = collectValues(data, fields);
+  if (Object.keys(payload).length === 0) {
+    return initialChoices;
+  }
 
+  const payloadList = pickObjectsToArray(fields, payload);
+  const choices: DataFilterChoices = payloadList.reduce((acc, curr) => {
+    const currPayloadList = payloadList.filter(f => f.key !== curr.key && f.value !== undefined);
+    const currPayload = pickArrayToObject(currPayloadList);
+    const found = filterItems(data, fields, currPayload);
+    const values = collectValues(found, fields);
+
+    acc[curr.key] = values[curr.key];
+
+    return acc;
+  }, collectValues(data, fields));
+
+  return choices;
+}
+
+export function dataFilter<T>(fields: DataFilterFields<T>) {
+  const dispatch: DataFilter<T> = (data, payload) => {
     return {
-      choices,
-      data
+      data: filterItems(data, fields, payload),
+      choices: createChoices(data, fields, payload)
     };
   };
-
   return dispatch;
 }

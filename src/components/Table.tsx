@@ -17,6 +17,29 @@ export interface FilterTableProps {
 export interface FilterTableState {}
 
 export class FilterTable extends React.Component<FilterTableProps, FilterTableState> {
+  renderTh(fields: any, key: string, choices?: string[]) {
+    const field = fields[key];
+    // if (field && field.name) {
+    //   return (
+    //     <th>{field.name}</th>
+    //   )
+    // }
+
+    return (
+      <th>
+        <div>{key}</div>
+        <div>
+          {choices ? choices.map(c => (
+            <label>
+              <input type="checkbox" value={c} />
+              <span>{c}</span>
+            </label>
+          )) : null}
+        </div>
+      </th>
+    )
+  }
+
   render() {
     const {
       input,
@@ -28,25 +51,21 @@ export class FilterTable extends React.Component<FilterTableProps, FilterTableSt
       choices,
       data,
     } = filter(input, {
-      // color: "#54D1F1",
-      // mobile: "iOS",
-      // fruit: "Apple",
-      // os: "OS X"
+      gender: "female",
+      color: "#54D1F1",
+      mobile: "iOS",
+      fruit: "Apple",
+      os: "OS X",
+      city: "London"
     });
+
+    console.log(data.length, choices);
 
     return (
       <table>
         <thead>
           {Object.keys(fields).map(f => {
-            const field = fields[f];
-            if (field && field.name) {
-              return (
-                <th>{field.name}</th>
-              )
-            }
-            return (
-              <th>{f}</th>
-            )
+            return this.renderTh(fields, f, choices[f]);
           })}
         </thead>
         <tbody>
