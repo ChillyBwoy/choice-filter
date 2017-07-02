@@ -1,0 +1,75 @@
+0 silly input [ 'build' ]
+1 silly flags { _: [ 'run' ],
+1 silly flags   sort: true,
+1 silly flags   stream: false,
+1 silly flags   'only-updated': false,
+1 silly flags   onlyUpdated: false,
+1 silly flags   parallel: false,
+1 silly flags   concurrency: 4,
+1 silly flags   script: 'build',
+1 silly flags   args: [] }
+2 verbose rootPath /Users/chillybwoy/Projects/datafilter
+3 info version 2.0.0-rc.5
+4 silly existsSync /Users/chillybwoy/Projects/datafilter/VERSION
+5 silly initialize attempt
+6 silly initialize success
+7 silly execute attempt
+8 silly runScriptInDir build [] datafilter
+9 silly getExecOpts { cwd: '/Users/chillybwoy/Projects/datafilter/packages/datafilter' }
+10 error build Errored while running script in 'datafilter'
+11 error execute Error: Command failed: npm run build
+11 error execute npm ERR! code ELIFECYCLE
+11 error execute npm ERR! errno 2
+11 error execute npm ERR! datafilter@1.0.0 build: `tsc -p .`
+11 error execute npm ERR! Exit status 2
+11 error execute npm ERR!
+11 error execute npm ERR! Failed at the datafilter@1.0.0 build script.
+11 error execute npm ERR! This is probably not a problem with npm. There is likely additional logging output above.
+11 error execute
+11 error execute npm ERR! A complete log of this run can be found in:
+11 error execute npm ERR!     /Users/chillybwoy/.npm/_logs/2017-07-02T21_54_21_322Z-debug.log
+11 error execute
+11 error execute > datafilter@1.0.0 build /Users/chillybwoy/Projects/datafilter/packages/datafilter
+11 error execute > tsc -p .
+11 error execute
+11 error execute src/filter.ts(47,15): error TS2339: Property 'reduce' does not exist on type 'DataFilterPick'.
+11 error execute src/filter.ts(47,48): error TS7006: Parameter 'curr' implicitly has an 'any' type.
+11 error execute src/filter.ts(128,43): error TS2345: Argument of type 'DataFilterPick[]' is not assignable to parameter of type 'DataFilterPick'.
+11 error execute   Property 'key' is missing in type 'DataFilterPick[]'.
+11 error execute
+11 error execute     at Promise.all.then.arr (/usr/local/lib/node_modules/lerna/node_modules/execa/index.js:210:11)
+11 error execute     at <anonymous>
+11 error execute     at process._tickCallback (internal/process/next_tick.js:169:7)
+11 error execute  callback with error
+11 error execute  { Error: Command failed: npm run build
+11 error execute npm ERR! code ELIFECYCLE
+11 error execute npm ERR! errno 2
+11 error execute npm ERR! datafilter@1.0.0 build: `tsc -p .`
+11 error execute npm ERR! Exit status 2
+11 error execute npm ERR!
+11 error execute npm ERR! Failed at the datafilter@1.0.0 build script.
+11 error execute npm ERR! This is probably not a problem with npm. There is likely additional logging output above.
+11 error execute
+11 error execute npm ERR! A complete log of this run can be found in:
+11 error execute npm ERR!     /Users/chillybwoy/.npm/_logs/2017-07-02T21_54_21_322Z-debug.log
+11 error execute
+11 error execute > datafilter@1.0.0 build /Users/chillybwoy/Projects/datafilter/packages/datafilter
+11 error execute > tsc -p .
+11 error execute
+11 error execute src/filter.ts(47,15): error TS2339: Property 'reduce' does not exist on type 'DataFilterPick'.
+11 error execute src/filter.ts(47,48): error TS7006: Parameter 'curr' implicitly has an 'any' type.
+11 error execute src/filter.ts(128,43): error TS2345: Argument of type 'DataFilterPick[]' is not assignable to parameter of type 'DataFilterPick'.
+11 error execute   Property 'key' is missing in type 'DataFilterPick[]'.
+11 error execute
+11 error execute     at Promise.all.then.arr (/usr/local/lib/node_modules/lerna/node_modules/execa/index.js:210:11)
+11 error execute     at <anonymous>
+11 error execute     at process._tickCallback (internal/process/next_tick.js:169:7)
+11 error execute   stack: 'Error: Command failed: npm run build\nnpm ERR! code ELIFECYCLE\nnpm ERR! errno 2\nnpm ERR! datafilter@1.0.0 build: `tsc -p .`\nnpm ERR! Exit status 2\nnpm ERR! \nnpm ERR! Failed at the datafilter@1.0.0 build script.\nnpm ERR! This is probably not a problem with npm. There is likely additional logging output above.\n\nnpm ERR! A complete log of this run can be found in:\nnpm ERR!     /Users/chillybwoy/.npm/_logs/2017-07-02T21_54_21_322Z-debug.log\n\n> datafilter@1.0.0 build /Users/chillybwoy/Projects/datafilter/packages/datafilter\n> tsc -p .\n\nsrc/filter.ts(47,15): error TS2339: Property \'reduce\' does not exist on type \'DataFilterPick\'.\nsrc/filter.ts(47,48): error TS7006: Parameter \'curr\' implicitly has an \'any\' type.\nsrc/filter.ts(128,43): error TS2345: Argument of type \'DataFilterPick[]\' is not assignable to parameter of type \'DataFilterPick\'.\n  Property \'key\' is missing in type \'DataFilterPick[]\'.\n\n    at Promise.all.then.arr (/usr/local/lib/node_modules/lerna/node_modules/execa/index.js:210:11)\n    at <anonymous>\n    at process._tickCallback (internal/process/next_tick.js:169:7)',
+11 error execute   code: 2,
+11 error execute   killed: false,
+11 error execute   stdout: '\n> datafilter@1.0.0 build /Users/chillybwoy/Projects/datafilter/packages/datafilter\n> tsc -p .\n\nsrc/filter.ts(47,15): error TS2339: Property \'reduce\' does not exist on type \'DataFilterPick\'.\nsrc/filter.ts(47,48): error TS7006: Parameter \'curr\' implicitly has an \'any\' type.\nsrc/filter.ts(128,43): error TS2345: Argument of type \'DataFilterPick[]\' is not assignable to parameter of type \'DataFilterPick\'.\n  Property \'key\' is missing in type \'DataFilterPick[]\'.\n',
+11 error execute   stderr: 'npm ERR! code ELIFECYCLE\nnpm ERR! errno 2\nnpm ERR! datafilter@1.0.0 build: `tsc -p .`\nnpm ERR! Exit status 2\nnpm ERR! \nnpm ERR! Failed at the datafilter@1.0.0 build script.\nnpm ERR! This is probably not a problem with npm. There is likely additional logging output above.\n\nnpm ERR! A complete log of this run can be found in:\nnpm ERR!     /Users/chillybwoy/.npm/_logs/2017-07-02T21_54_21_322Z-debug.log\n',
+11 error execute   failed: true,
+11 error execute   signal: null,
+11 error execute   cmd: 'npm run build',
+11 error execute   timedOut: false }

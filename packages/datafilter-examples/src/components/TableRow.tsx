@@ -1,6 +1,6 @@
-import React from "react";
+import React, { PureComponent } from "react";
+import { DataFilterFields } from "@chillybwoy/datafilter";
 
-import { DataFilterFields } from "../filter";
 import {
   Person,
   PersonMap
@@ -11,7 +11,7 @@ export interface FilterTableItemProps {
   data: PersonMap;
 }
 
-export class FilterTableItem extends React.Component<FilterTableItemProps, {}> {
+class FilterTableItem extends PureComponent<FilterTableItemProps, {}> {
   render() {
     const {
       data,
@@ -29,3 +29,5 @@ export class FilterTableItem extends React.Component<FilterTableItemProps, {}> {
     );
   }
 }
+
+export default FilterTableItem;

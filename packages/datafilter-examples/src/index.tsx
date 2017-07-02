@@ -1,8 +1,9 @@
 import React from "react";
 import ReactDOM from "react-dom";
 
-import { dataFilter } from "./filter.js";
-import { FilterTable } from "./components/Table.js";
+import dataFilter from "@chillybwoy/datafilter";
+
+import FilterTable from "./components/Table";
 import { Person } from "./types";
 
 fetch('/data/people.json')

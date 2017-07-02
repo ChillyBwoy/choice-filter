@@ -1,14 +1,21 @@
 {
-  "name": "datafilter-examples",
+  "name": "@chillybwoy/datafilter-examples",
   "private": true,
   "version": "1.0.0",
   "author": "Eugene Cheltsov <chill.icp@gmail.com>",
   "license": "MIT",
+  "scripts": {
+    "build": "./node_modules/.bin/webpack"
+  },
   "dependencies": {
+    "@chillybwoy/datafilter": "1.0.0",
     "@types/react": "^15.0.34",
     "@types/react-dom": "^15.5.1",
     "react": "^15.6.1",
     "react-dom": "^15.6.1",
-    "typescript": "^2.4.1"
+    "ts-loader": "^2.2.2",
+    "typescript": "^2.4.1",
+    "webpack": "^3.0.0",
+    "webpack-dev-server": "^2.5.0"
   }
 }

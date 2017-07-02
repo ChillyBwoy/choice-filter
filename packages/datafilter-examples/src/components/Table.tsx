@@ -1,11 +1,12 @@
-import React from "react";
-
-import { Person } from "../types";
+import React, { Component } from "react";
 import {
   DataFilter,
   DataFilterFields,
-} from "../filter";
-import { FilterTableItem } from "./TableRow.js";
+} from "@chillybwoy/datafilter";
+
+import { Person } from "../types";
+
+import FilterTableItem from "./TableRow";
 
 export interface FilterTableProps {
   input: Person[];
@@ -15,7 +16,7 @@ export interface FilterTableProps {
 
 export interface FilterTableState {}
 
-export class FilterTable extends React.Component<FilterTableProps, FilterTableState> {
+class FilterTable extends Component<FilterTableProps, FilterTableState> {
   renderTh(fields: any, key: string, choices?: string[]) {
     const field = fields[key];
     return (
@@ -70,3 +71,5 @@ export class FilterTable extends React.Component<FilterTableProps, FilterTableSt
     )
   }
 }
+
+export default FilterTable;

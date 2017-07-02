@@ -1,18 +1,27 @@
 {
-  "name": "datafilter",
+  "name": "@chillybwoy/datafilter",
   "version": "1.0.0",
   "description": "",
+  "main": "./dist/filter.ts",
+  "types": "./dist/filter.dts",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/ChillyBwoy/datafilter.git"
   },
+  "scripts": {
+    "build": "./node_modules/.bin/tsc -p .",
+    "watch": "./node_modules/.bin/tsc -p . --watch"
+  },
+  "files": [
+    "./dist"
+  ],
   "author": "Eugene Cheltsov <chill.icp@gmail.com>",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/ChillyBwoy/datafilter/issues"
   },
   "homepage": "https://github.com/ChillyBwoy/datafilter#readme",
-  "dependencies": {
+  "devDependencies": {
     "typescript": "^2.4.1"
   }
 }
