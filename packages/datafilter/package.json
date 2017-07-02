@@ -1,10 +1,7 @@
 {
-  "name": "datafilter-packages",
-  "private": true,
+  "name": "datafilter",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
-  "scripts": {},
   "repository": {
     "type": "git",
     "url": "git+https://github.com/ChillyBwoy/datafilter.git"
@@ -15,7 +12,7 @@
     "url": "https://github.com/ChillyBwoy/datafilter/issues"
   },
   "homepage": "https://github.com/ChillyBwoy/datafilter#readme",
-  "devDependencies": {
-    "lerna": "^2.0.0-rc.5"
+  "dependencies": {
+    "typescript": "^2.4.1"
   }
 }
