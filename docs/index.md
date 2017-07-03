@@ -12,4 +12,4 @@
   }
 </style>
 <div id="root"></div>
-<script src="/js/bundle.js"></script>
+<script src="js/bundle.js"></script>
