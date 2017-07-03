@@ -1,7 +1,7 @@
 {
   "name": "choice-filter",
   "version": "1.0.0",
-  "description": "",
+  "description": "Multiple choice filter",
   "main": "dist/filter.js",
   "types": "dist/filter.d.ts",
   "repository": {
