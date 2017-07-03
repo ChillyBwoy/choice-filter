@@ -1,0 +1,20 @@
+{
+  "name": "choice-filter-packages",
+  "private": true,
+  "version": "1.0.0",
+  "description": "TODO: add readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ChillyBwoy/choice-filter.git"
+  },
+  "author": "Eugene Cheltsov <chill.icp@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ChillyBwoy/choice-filter/issues"
+  },
+  "homepage": "https://github.com/ChillyBwoy/choice-filter#readme",
+  "devDependencies": {
+    "lerna": "^2.0.0-rc.5",
+    "typescript": "^2.4.1"
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "name": "choice-filter",
+  "version": "1.0.0",
+  "description": "Multiple choice filter",
+  "main": "dist/filter.js",
+  "types": "dist/filter.d.ts",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ChillyBwoy/choice-filter.git"
+  },
+  "scripts": {
+    "build": "./node_modules/.bin/tsc -p .",
+    "watch": "./node_modules/.bin/tsc -p . --watch"
+  },
+  "files": [
+    "dist"
+  ],
+  "author": "Eugene Cheltsov <chill.icp@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ChillyBwoy/choice-filter/issues"
+  },
+  "homepage": "https://github.com/ChillyBwoy/choice-filter#readme",
+  "devDependencies": {
+    "typescript": "^2.4.1"
+  }
+}

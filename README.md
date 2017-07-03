@@ -1,4 +1,1 @@
-DataFilter
-==========
-
-See [demo](http://chillybwoy.github.io/datafilter/)
+TODO: add readme
