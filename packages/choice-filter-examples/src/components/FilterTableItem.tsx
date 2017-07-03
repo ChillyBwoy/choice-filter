@@ -1,6 +1,6 @@
 import * as React from "react";
 import { PureComponent } from "react";
-import { DataFilterFields } from "@chillybwoy/datafilter";
+import { ChoiceFilterFields } from "choice-filter";
 
 import {
   Person,
@@ -8,7 +8,7 @@ import {
 } from "../types";
 
 export interface FilterTableItemProps {
-  fields: DataFilterFields<Person>;
+  fields: ChoiceFilterFields<Person>;
   data: PersonMap;
 }
 

@@ -1,7 +1,7 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 
-import dataFilter, { DataFilterFields } from "@chillybwoy/datafilter";
+import choiceFilter, { ChoiceFilterFields } from "choice-filter";
 
 import FilterTable from "./components/FilterTable";
 import { Person } from "./types";
@@ -9,7 +9,7 @@ import { Person } from "./types";
 fetch('/data/people.json')
   .then(r => r.json())
   .then(json => {
-    const fields: DataFilterFields<Person> = {
+    const fields: ChoiceFilterFields<Person> = {
       isActive: {
         serialize(item) {
           return item ? "yes" : "no";
@@ -56,7 +56,7 @@ fetch('/data/people.json')
       }
     };
 
-    const filter = dataFilter<Person>(fields);
+    const filter = choiceFilter<Person>(fields);
 
     ReactDOM.render(
       <FilterTable

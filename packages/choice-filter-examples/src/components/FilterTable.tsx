@@ -1,9 +1,9 @@
 import * as React from "react";
 import { Component } from "react";
 import {
-  DataFilter,
-  DataFilterFields,
-} from "@chillybwoy/datafilter";
+  ChoiceFilter,
+  ChoiceFilterFields,
+} from "choice-filter";
 
 import { Person } from "../types";
 
@@ -12,8 +12,8 @@ import FilterChoices from "./FilterChoices";
 
 export interface FilterTableProps {
   input: Person[];
-  filter: DataFilter<Person>;
-  fields: DataFilterFields<Person>;
+  filter: ChoiceFilter<Person>;
+  fields: ChoiceFilterFields<Person>;
 }
 
 export interface FilterTableState {

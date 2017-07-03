@@ -1,12 +1,12 @@
 {
-  "name": "@chillybwoy/datafilter",
+  "name": "choice-filter",
   "version": "1.0.0",
   "description": "",
   "main": "dist/filter.js",
   "types": "dist/filter.d.ts",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ChillyBwoy/datafilter.git"
+    "url": "https://github.com/ChillyBwoy/choice-filter.git"
   },
   "scripts": {
     "build": "./node_modules/.bin/tsc -p .",
@@ -18,9 +18,9 @@
   "author": "Eugene Cheltsov <chill.icp@gmail.com>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/ChillyBwoy/datafilter/issues"
+    "url": "https://github.com/ChillyBwoy/choice-filter/issues"
   },
-  "homepage": "https://github.com/ChillyBwoy/datafilter#readme",
+  "homepage": "https://github.com/ChillyBwoy/choice-filter#readme",
   "devDependencies": {
     "typescript": "^2.4.1"
   }

@@ -1,5 +1,5 @@
 {
-  "name": "@chillybwoy/datafilter-examples",
+  "name": "choice-filter-examples",
   "private": true,
   "version": "1.0.0",
   "author": "Eugene Cheltsov <chill.icp@gmail.com>",
@@ -9,7 +9,7 @@
     "start": "./node_modules/.bin/webpack-dev-server"
   },
   "dependencies": {
-    "@chillybwoy/datafilter": "1.0.0",
+    "choice-filter": "1.0.0",
     "@types/react": "^15.0.34",
     "@types/react-dom": "^15.5.1",
     "react": "^15.6.1",

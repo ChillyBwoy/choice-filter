@@ -1,26 +1,26 @@
-export type DataFilterMap<T> = {
+export type ChoiceFilterMap<T> = {
   [key: string]: T;
 }
 
-export type DataFilterFields<T> = Partial<Record<keyof T, DataFilterField>>;
-export type DataFilterChoices = DataFilterMap<any[]>;
-export type DataFilterPayload = DataFilterMap<any[]>;
+export type ChoiceFilterFields<T> = Partial<Record<keyof T, ChoiceFilterField>>;
+export type ChoiceFilterChoices = ChoiceFilterMap<any[]>;
+export type ChoiceFilterPayload = ChoiceFilterMap<any[]>;
 
-export interface DataFilterField {
+export interface ChoiceFilterField {
   name?: string;
   match?: (item: any, value: any[]) => boolean;
   serialize?: (item: any, index?: number) => string;
   ignore?: boolean;
 }
 
-export interface DataFilter<T> {
-  (data: T[], payload: DataFilterMap<any>): {
+export interface ChoiceFilter<T> {
+  (data: T[], payload: ChoiceFilterMap<any>): {
     data: T[];
-    choices: DataFilterChoices;
+    choices: ChoiceFilterChoices;
   }
 }
 
-export interface DataFilterPick {
+export interface ChoiceFilterPick {
   key: string;
   value: any;
 }
@@ -31,7 +31,7 @@ export interface DataFilterPick {
  * @param keysFrom keys source
  * @param valuesFrom values source
  */
-function pickObjectsToArray(keysFrom: any, valuesFrom: any): DataFilterPick[] {
+function pickObjectsToArray(keysFrom: any, valuesFrom: any): ChoiceFilterPick[] {
   const keys = Object.keys(keysFrom);
 
   return keys.map(key => {
@@ -42,14 +42,14 @@ function pickObjectsToArray(keysFrom: any, valuesFrom: any): DataFilterPick[] {
   });
 }
 
-function pickArrayToObject(data: DataFilterPick[]) {
-  return data.reduce((acc: DataFilterMap<any>, curr) => {
+function pickArrayToObject(data: ChoiceFilterPick[]) {
+  return data.reduce((acc: ChoiceFilterMap<any>, curr) => {
     acc[curr.key] = curr.value;
     return acc;
   }, {});
 }
 
-function getAllowedFiled<T>(fields: DataFilterFields<T>) {
+function getAllowedFiled<T>(fields: ChoiceFilterFields<T>) {
   const keys = Object.keys(fields);
   return keys.filter(key => {
     const field = fields[key];
@@ -61,8 +61,8 @@ function getAllowedFiled<T>(fields: DataFilterFields<T>) {
   });
 }
 
-function collectValues<T extends DataFilterMap<any>>(data: T[], fields: DataFilterFields<T>) {
-  const result: DataFilterMap<any> = {};
+function collectValues<T extends ChoiceFilterMap<any>>(data: T[], fields: ChoiceFilterFields<T>) {
+  const result: ChoiceFilterMap<any> = {};
   const keys = getAllowedFiled<T>(fields);
 
   data.forEach((item, i) => {
@@ -85,10 +85,10 @@ function collectValues<T extends DataFilterMap<any>>(data: T[], fields: DataFilt
   return result;
 }
 
-function filterItems<T extends DataFilterMap<any>>(
+function filterItems<T extends ChoiceFilterMap<any>>(
     data: T[],
-    fields: DataFilterFields<T>,
-    payload: DataFilterMap<any[]>) {
+    fields: ChoiceFilterFields<T>,
+    payload: ChoiceFilterMap<any[]>) {
 
   const keys = Object.keys(fields);
   const size = keys.length;
@@ -113,17 +113,17 @@ function filterItems<T extends DataFilterMap<any>>(
   });
 }
 
-function createChoices<T extends DataFilterMap<any>>(
+function createChoices<T extends ChoiceFilterMap<any>>(
     data: T[],
-    fields: DataFilterFields<T>,
-    payload: DataFilterMap<any>) {
+    fields: ChoiceFilterFields<T>,
+    payload: ChoiceFilterMap<any>) {
   const initialChoices = collectValues(data, fields);
   if (Object.keys(payload).length === 0) {
     return initialChoices;
   }
 
   const payloadList = pickObjectsToArray(fields, payload);
-  const choices: DataFilterChoices = payloadList.reduce((acc, curr) => {
+  const choices: ChoiceFilterChoices = payloadList.reduce((acc, curr) => {
     const currPayloadList = payloadList.filter(f => f.key !== curr.key && f.value !== undefined);
     const currPayload = pickArrayToObject(currPayloadList);
     const found = filterItems(data, fields, currPayload);
@@ -137,8 +137,8 @@ function createChoices<T extends DataFilterMap<any>>(
   return choices;
 }
 
-export default function dataFilter<T>(fields: DataFilterFields<T>) {
-  const dispatch: DataFilter<T> = (data, payload) => {
+export default function choiceFilter<T>(fields: ChoiceFilterFields<T>) {
+  const dispatch: ChoiceFilter<T> = (data, payload) => {
     return {
       data: filterItems(data, fields, payload),
       choices: createChoices(data, fields, payload)
