@@ -8,6 +8,7 @@ import {
 import { Person } from "../types";
 
 import FilterTableItem from "./FilterTableItem";
+import FilterChoices from "./FilterChoices";
 
 export interface FilterTableProps {
   input: Person[];
@@ -17,7 +18,7 @@ export interface FilterTableProps {
 
 export interface FilterTableState {
   values: {
-    [key: string]: any;
+    [key: string]: any[];
   }
 }
 
@@ -30,45 +31,30 @@ class FilterTable extends Component<FilterTableProps, FilterTableState> {
     };
   }
 
-  _handleChoiceChange(event: React.ChangeEvent<HTMLInputElement>, key: string) {
-    const { value } = event.target;
+  _handleChoicesChange = (name: string, choiceValues: any[]) => {
     const { values } = this.state;
 
     this.setState({
       values: {
         ...values,
-        [key]: value === '' ? undefined : value
-      }
-    });
+         [name]: choiceValues
+       }
+     }) 
   }
 
   renderTh(fields: any, name: string, choices: string[]) {
     const field = fields[name];
-    const { values } = this.state;
 
     return (
       <div>
-        <div>{name}</div>
+        <p>{name}</p>
         {field.ignore ? null : (
           <div>
-            <label>
-              <input type="radio"
-                    name={name}
-                    checked={values[name] === undefined}
-                    value=""
-                    onChange={e => this._handleChoiceChange(e, name)} />
-              <span>---</span>
-            </label>
-            {choices ? choices.map((c, i) => (
-              <label key={i}>
-                <input type="radio"
-                      name={name}
-                      value={c}
-                      checked={values[name] === c}
-                      onChange={e => this._handleChoiceChange(e, name)} />
-                <span>{c}</span>
-              </label>
-            )) : null}
+            {choices ? (
+              <FilterChoices name={name}
+                             choices={choices}
+                             onChange={this._handleChoicesChange} />
+            ) : null}
           </div>
         )}
       </div>
@@ -76,12 +62,12 @@ class FilterTable extends Component<FilterTableProps, FilterTableState> {
   }
 
   render() {
-    const { values } = this.state;
     const {
       input,
       filter,
       fields,
     } = this.props;
+    const { values } = this.state;
 
     const {
       choices,
@@ -89,22 +75,27 @@ class FilterTable extends Component<FilterTableProps, FilterTableState> {
     } = filter(input, values);
 
     return (
-      <table>
-        <thead>
-          <tr>
-            {Object.keys(fields).map((f, i) => (
-              <th key={i}>
-                {this.renderTh(fields, f, choices[f])}
-              </th>
+      <div>
+        <h3>{data.length} / {input.length}</h3>
+        <table>
+          <thead>
+            <tr>
+              {Object.keys(fields).map((f, i) => (
+                <th key={i}>
+                  {this.renderTh(fields, f, choices[f])}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {data.map(d => (
+              <FilterTableItem key={d.id} data={d} fields={fields} />
             ))}
-          </tr>
-        </thead>
-        <tbody>
-          {data.map(d => (
-            <FilterTableItem key={d.id} data={d} fields={fields} />
-          ))}
-        </tbody>
-      </table>
+          </tbody>
+        </table>
+        <h3>Query:</h3>
+        <pre>{JSON.stringify(values, null, 2)}</pre>
+      </div>
     )
   }
 }

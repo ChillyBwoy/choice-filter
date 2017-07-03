@@ -16,6 +16,7 @@
   },
   "homepage": "https://github.com/ChillyBwoy/datafilter#readme",
   "devDependencies": {
-    "lerna": "^2.0.0-rc.5"
+    "lerna": "^2.0.0-rc.5",
+    "typescript": "^2.4.1"
   }
 }

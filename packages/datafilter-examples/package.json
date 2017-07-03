@@ -5,7 +5,8 @@
   "author": "Eugene Cheltsov <chill.icp@gmail.com>",
   "license": "MIT",
   "scripts": {
-    "build": "./node_modules/.bin/webpack"
+    "build": "./node_modules/.bin/webpack",
+    "start": "./node_modules/.bin/webpack-dev-server"
   },
   "dependencies": {
     "@chillybwoy/datafilter": "1.0.0",

@@ -2,14 +2,13 @@ export type DataFilterMap<T> = {
   [key: string]: T;
 }
 
-export type DataFilterFields<T> = Partial<Record<keyof T, DataFilterField<T>>>;
+export type DataFilterFields<T> = Partial<Record<keyof T, DataFilterField>>;
 export type DataFilterChoices = DataFilterMap<any[]>;
 export type DataFilterPayload = DataFilterMap<any[]>;
 
-export interface DataFilterField<T> {
+export interface DataFilterField {
   name?: string;
-  format?: (value: any, row: T) => any;
-  match?: (item: T, value: any) => boolean;
+  match?: (item: any, value: any[]) => boolean;
   serialize?: (item: any, index?: number) => string;
   ignore?: boolean;
 }
@@ -17,7 +16,7 @@ export interface DataFilterField<T> {
 export interface DataFilter<T> {
   (data: T[], payload: DataFilterMap<any>): {
     data: T[];
-    choices: DataFilterChoices
+    choices: DataFilterChoices;
   }
 }
 
@@ -89,7 +88,7 @@ function collectValues<T extends DataFilterMap<any>>(data: T[], fields: DataFilt
 function filterItems<T extends DataFilterMap<any>>(
     data: T[],
     fields: DataFilterFields<T>,
-    payload: DataFilterMap<any>) {
+    payload: DataFilterMap<any[]>) {
 
   const keys = Object.keys(fields);
   const size = keys.length;
@@ -97,16 +96,21 @@ function filterItems<T extends DataFilterMap<any>>(
   return data.filter(item => {
     const success = keys.filter(pk => {
       const field = fields[pk];
-      const value = payload[pk];
+      const values = payload[pk];
 
-      if (value === undefined) {
+      if (values === undefined) {
         return true;
       }
-      if (field && field.match) {
-        return field.match(item[pk], value);
+
+      if (values.length === 0) {
+        return true;
       }
 
-      return item[pk] === value;
+      if (field && field.match) {
+        return field.match(item[pk], values);
+      }
+
+      return values.indexOf(item[pk]) !== -1;
     });
 
     return success.length === size;

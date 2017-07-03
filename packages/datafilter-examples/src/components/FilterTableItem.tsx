@@ -22,8 +22,8 @@ class FilterTableItem extends PureComponent<FilterTableItemProps, {}> {
     return (
       <tr>
         {Object.keys(fields).map((f: keyof Person, i) => {
-          return fields[f]!.format
-            ? (<td key={i}>{fields[f]!.format!(data[f], data)}</td>)
+          return fields[f]!.serialize
+            ? (<td key={i}>{fields[f]!.serialize!(data[f])}</td>)
             : (<td key={i}>{data[f]}</td>)
         })}
       </tr>

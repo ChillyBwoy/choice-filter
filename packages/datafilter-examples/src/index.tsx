@@ -11,12 +11,22 @@ fetch('/data/people.json')
   .then(json => {
     const fields: DataFilterFields<Person> = {
       isActive: {
-        format(value: boolean) {
-          return value ? "yes" : "no"
+        serialize(item) {
+          return item ? "yes" : "no";
+        },
+        match(v, values) {
+          return values.indexOf(
+            this.serialize ? this.serialize(v) : v
+          ) !== -1;
         }
       },
       age: {
-        ignore: true
+        serialize(item) {
+          return item.toString();
+        },
+        match(v, values) {
+          return values.indexOf(v.toString()) !== -1;
+        }
       },
       firstName: {
         ignore: true
@@ -35,12 +45,10 @@ fetch('/data/people.json')
       os: {},
       fruit: {},
       tags: {
-        match(item, value) {
-          const s = this.serialize ? this.serialize(item) : "";
-          return s === value;
-        },
-        format(value: string[]) {
-          return value.join(", ");
+        match(v, values) {
+          return values.indexOf(
+            this.serialize ? this.serialize(v) : v
+          ) !== -1;
         },
         serialize(list: any[]) {
           return list.slice(0).sort().join("|");
