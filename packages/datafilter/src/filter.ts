@@ -96,21 +96,17 @@ function filterItems<T extends DataFilterMap<any>>(
   return data.filter(item => {
     const success = keys.filter(pk => {
       const field = fields[pk];
-      const values = payload[pk];
+      const value = payload[pk];
 
-      if (values === undefined) {
-        return true;
-      }
-
-      if (values.length === 0) {
+      if (value === undefined) {
         return true;
       }
 
       if (field && field.match) {
-        return field.match(item[pk], values);
+        return field.match(item[pk], value);
       }
 
-      return values.indexOf(item[pk]) !== -1;
+      return item[pk] === value;
     });
 
     return success.length === size;

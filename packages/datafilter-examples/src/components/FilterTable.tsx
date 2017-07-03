@@ -18,7 +18,7 @@ export interface FilterTableProps {
 
 export interface FilterTableState {
   values: {
-    [key: string]: any[];
+    [key: string]: any;
   }
 }
 
@@ -31,15 +31,15 @@ class FilterTable extends Component<FilterTableProps, FilterTableState> {
     };
   }
 
-  _handleChoicesChange = (name: string, choiceValues: any[]) => {
+  _handleChoicesChange = (name: string, value: any) => {
     const { values } = this.state;
 
     this.setState({
       values: {
         ...values,
-         [name]: choiceValues
-       }
-     }) 
+        [name]: value
+      }
+    });
   }
 
   renderTh(fields: any, name: string, choices: string[]) {
