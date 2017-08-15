@@ -2,11 +2,8 @@
   "extends": "../../tsconfig.json",
   "compilerOptions": {
     "outDir": "./dist",
-    "sourceMap": true
+    "jsx": "react"
   },
-  "files": [
-    "./src/filter.ts"
-  ],
   "exclude": [
     "node_modules"
   ]

@@ -1,5 +1,5 @@
 {
-  "name": "choice-filter-examples",
+  "name": "choice-filter-example",
   "private": true,
   "version": "1.0.0",
   "author": "Eugene Cheltsov <chill.icp@gmail.com>",
@@ -9,16 +9,16 @@
     "start": "./node_modules/.bin/webpack-dev-server"
   },
   "dependencies": {
-    "@types/node": "^8.0.7",
-    "@types/react": "^15.0.34",
-    "@types/react-dom": "^15.5.1",
-    "choice-filter": "1.0.0",
-    "json-loader": "^0.5.4",
+    "@types/node": "^8.0.22",
+    "@types/react": "^16.0.2",
+    "@types/react-dom": "^15.5.3",
+    "choice-filter": "^1.0.0",
+    "json-loader": "^0.5.7",
     "react": "^15.6.1",
     "react-dom": "^15.6.1",
-    "ts-loader": "^2.2.2",
-    "typescript": "^2.4.1",
-    "webpack": "^3.0.0",
-    "webpack-dev-server": "^2.5.0"
+    "ts-loader": "^2.3.2",
+    "typescript": "^2.4.2",
+    "webpack": "^3.5.4",
+    "webpack-dev-server": "^2.7.1"
   }
 }

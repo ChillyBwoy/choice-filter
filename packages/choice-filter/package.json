@@ -8,10 +8,6 @@
     "type": "git",
     "url": "https://github.com/ChillyBwoy/choice-filter.git"
   },
-  "scripts": {
-    "build": "./node_modules/.bin/tsc -p .",
-    "watch": "./node_modules/.bin/tsc -p . --watch"
-  },
   "files": [
     "dist"
   ],
@@ -20,8 +16,5 @@
   "bugs": {
     "url": "https://github.com/ChillyBwoy/choice-filter/issues"
   },
-  "homepage": "https://github.com/ChillyBwoy/choice-filter#readme",
-  "devDependencies": {
-    "typescript": "^2.4.1"
-  }
+  "homepage": "https://github.com/ChillyBwoy/choice-filter#readme"
 }

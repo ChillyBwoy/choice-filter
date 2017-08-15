@@ -31,9 +31,9 @@ export interface ChoiceFilterPick {
  * @param keysFrom keys source
  * @param valuesFrom values source
  */
-function pickObjectsToArray(keysFrom: any, valuesFrom: any): ChoiceFilterPick[] {
-  const keys = Object.keys(keysFrom);
-
+function pick(
+    keys: string[],
+    valuesFrom: any): ChoiceFilterPick[] {
   return keys.map(key => {
     return {
       key,
@@ -121,10 +121,12 @@ function createChoices<T extends ChoiceFilterMap<any>>(
   if (Object.keys(payload).length === 0) {
     return initialChoices;
   }
-
-  const payloadList = pickObjectsToArray(fields, payload);
+  console.log(payload);
+  const payloadList = pick(Object.keys(fields), payload);
   const choices: ChoiceFilterChoices = payloadList.reduce((acc, curr) => {
-    const currPayloadList = payloadList.filter(f => f.key !== curr.key && f.value !== undefined);
+    const currPayloadList = payloadList.filter(f => {
+      return f.key !== curr.key && f.value !== undefined;
+    });
     const currPayload = pickArrayToObject(currPayloadList);
     const found = filterItems(data, fields, currPayload);
     const values = collectValues(found, fields);

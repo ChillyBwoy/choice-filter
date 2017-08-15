@@ -17,9 +17,7 @@ th {
 }
 
 .filterChoices {
-  border: 1px solid #000;
-  max-height: 200px;
-  overflow-y: scroll;
+  border: 1px solid #ccc;
   padding: 5px;
 }
 .filterChoices label {

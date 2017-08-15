@@ -3,6 +3,7 @@ import { Component } from "react";
 import {
   ChoiceFilter,
   ChoiceFilterFields,
+  ChoiceFilterMap,
 } from "choice-filter";
 
 import { Person } from "../types";
@@ -26,8 +27,16 @@ class FilterTable extends Component<FilterTableProps, FilterTableState> {
   constructor(props: FilterTableProps) {
     super(props);
 
+    const { fields } = props;
+    const values: ChoiceFilterMap<any[]> = {};
+
+    for (const key of Object.keys(fields)) {
+      const field = fields[key] as any;
+      values[key] = [];
+    }
+
     this.state = {
-      values: {}
+      values
     };
   }
 

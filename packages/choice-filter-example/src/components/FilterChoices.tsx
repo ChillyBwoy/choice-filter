@@ -48,21 +48,13 @@ class FilterChoices extends Component<FilterChoicesProps, FilterChoicesState> {
 
     return (
       <div className="filterChoices">
-        <label>
-          <input type="radio"
-                name={name}
-                value=""
-                checked={value === undefined}
-                onChange={this._handleChange} />
-          <span>---</span>
-        </label>
         {choices.slice(0).sort().map((c, i) => (
           <label key={i}>
-            <input type="radio"
-                  name={name}
-                  value={c}
-                  checked={value === c}
-                  onChange={this._handleChange} />
+            <input type="checkbox"
+                   name={name}
+                   value={c}
+                   checked={value === c}
+                   onChange={this._handleChange} />
             <span>{c}</span>
           </label>
         ))}

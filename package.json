@@ -13,8 +13,8 @@
     "url": "https://github.com/ChillyBwoy/choice-filter/issues"
   },
   "homepage": "https://github.com/ChillyBwoy/choice-filter#readme",
-  "devDependencies": {
-    "lerna": "^2.0.0-rc.5",
-    "typescript": "^2.4.1"
+  "dependencies": {
+    "lerna": "^2.0.0",
+    "typescript": "^2.4.2"
   }
 }
