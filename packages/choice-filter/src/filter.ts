@@ -61,7 +61,9 @@ function getAllowedFiled<T>(fields: ChoiceFilterFields<T>) {
   });
 }
 
-function collectValues<T extends ChoiceFilterMap<any>>(data: T[], fields: ChoiceFilterFields<T>) {
+function collectValues<T extends ChoiceFilterMap<any>>(
+    data: T[],
+    fields: ChoiceFilterFields<T>) {
   const result: ChoiceFilterMap<any> = {};
   const keys = getAllowedFiled<T>(fields);
 
@@ -118,10 +120,11 @@ function createChoices<T extends ChoiceFilterMap<any>>(
     fields: ChoiceFilterFields<T>,
     payload: ChoiceFilterMap<any>) {
   const initialChoices = collectValues(data, fields);
+
   if (Object.keys(payload).length === 0) {
     return initialChoices;
   }
-  console.log(payload);
+
   const payloadList = pick(Object.keys(fields), payload);
   const choices: ChoiceFilterChoices = payloadList.reduce((acc, curr) => {
     const currPayloadList = payloadList.filter(f => {

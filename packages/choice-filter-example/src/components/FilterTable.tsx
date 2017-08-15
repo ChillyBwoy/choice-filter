@@ -30,13 +30,8 @@ class FilterTable extends Component<FilterTableProps, FilterTableState> {
     const { fields } = props;
     const values: ChoiceFilterMap<any[]> = {};
 
-    for (const key of Object.keys(fields)) {
-      const field = fields[key] as any;
-      values[key] = [];
-    }
-
     this.state = {
-      values
+      values: {}
     };
   }
 
