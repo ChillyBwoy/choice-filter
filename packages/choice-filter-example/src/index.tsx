@@ -10,22 +10,24 @@ const people = require("./data/people.json");
 
 const fields: ChoiceFilterFields<Person> = {
   isActive: {
+    ignore: true,
+    // match(v, values) {
+    //   return values.indexOf(
+    //     this.serialize ? this.serialize(v) : v
+    //   ) !== -1;
+    // }
     serialize(item) {
       return item ? "yes" : "no";
     },
-    match(v, values) {
-      return values.indexOf(
-        this.serialize ? this.serialize(v) : v
-      ) !== -1;
-    }
   },
   age: {
+    ignore: true,
+    // match(v, values) {
+    //   return values.indexOf(v.toString()) !== -1;
+    // }
     serialize(item) {
       return item.toString();
     },
-    match(v, values) {
-      return values.indexOf(v.toString()) !== -1;
-    }
   },
   firstName: {
     ignore: true
@@ -44,11 +46,12 @@ const fields: ChoiceFilterFields<Person> = {
   os: {},
   fruit: {},
   tags: {
-    match(v, values) {
-      return values.indexOf(
-        this.serialize ? this.serialize(v) : v
-      ) !== -1;
-    },
+    ignore: true,
+    // match(v, values) {
+    //   return values.indexOf(
+    //     this.serialize ? this.serialize(v) : v
+    //   ) !== -1;
+    // },
     serialize(list: any[]) {
       return list.slice(0).sort().join("|");
     }

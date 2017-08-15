@@ -8,7 +8,7 @@ export interface FilterChoicesProps {
 }
 
 export interface FilterChoicesState {
-  value: any;
+  values: any[];
 }
 
 class FilterChoices extends Component<FilterChoicesProps, FilterChoicesState> {
@@ -20,27 +20,30 @@ class FilterChoices extends Component<FilterChoicesProps, FilterChoicesState> {
   constructor(props: FilterChoicesProps) {
     super(props);
     this.state = {
-      value: undefined
+      values: []
     }
   }
 
   _handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = event.target;
+    const { values } = this.state;
     const {
       name,
-      onChange
+      onChange,
     } = this.props;
 
     this.setState({
-      value: value === '' ? undefined : value
+      values: values.indexOf(value) === -1
+        ? values.concat(value)
+        : values.filter((x: any) => x !== value)
     }, () => {
-      const { value } = this.state;
-      onChange(name, value);
+      const { values } = this.state;
+      onChange(name, values);
     });
   }
 
   render() {
-    const { value } = this.state;
+    const { values } = this.state;
     const {
       choices,
       name,
@@ -48,20 +51,12 @@ class FilterChoices extends Component<FilterChoicesProps, FilterChoicesState> {
 
     return (
       <div className="filterChoices">
-        <label>
-          <input type="radio"
-                 name={name}
-                 value=""
-                 checked={value === undefined}
-                 onChange={this._handleChange} />
-          <span>---</span>
-        </label>
         {choices.slice(0).sort().map((c, i) => (
           <label key={i}>
-            <input type="radio"
+            <input type="checkbox"
                    name={name}
                    value={c}
-                   checked={value === c}
+                   checked={values.indexOf(c) !== -1}
                    onChange={this._handleChange} />
             <span>{c}</span>
           </label>

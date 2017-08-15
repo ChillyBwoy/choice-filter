@@ -7,6 +7,9 @@
     "type": "git",
     "url": "git+https://github.com/ChillyBwoy/choice-filter.git"
   },
+  "scripts": {
+    "start": "./node_modules/.bin/tsc -p ./packages/choice-filter --watch"
+  },
   "author": "Eugene Cheltsov <chill.icp@gmail.com>",
   "license": "MIT",
   "bugs": {
