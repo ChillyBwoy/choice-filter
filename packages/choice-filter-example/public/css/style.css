@@ -24,3 +24,7 @@ th {
   display: block;
   white-space: nowrap;
 }
+
+input[type="checkbox"]:disabled + span {
+  opacity: 0.3;
+}

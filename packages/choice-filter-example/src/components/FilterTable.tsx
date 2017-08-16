@@ -12,6 +12,7 @@ import FilterTableItem from "./FilterTableItem";
 import FilterChoices from "./FilterChoices";
 
 export interface FilterTableProps {
+  choices: ChoiceFilterMap<any>;
   input: Person[];
   filter: ChoiceFilter<Person>;
   fields: ChoiceFilterFields<Person>;
@@ -46,7 +47,11 @@ class FilterTable extends Component<FilterTableProps, FilterTableState> {
     });
   }
 
-  renderTh(fields: any, name: string, choices: string[]) {
+  renderTh(
+      fields: any,
+      name: string,
+      choices: string[],
+      choicesAll: string[]) {
     const field = fields[name];
 
     return (
@@ -54,11 +59,10 @@ class FilterTable extends Component<FilterTableProps, FilterTableState> {
         <p>{name}</p>
         {field.ignore ? null : (
           <div>
-            {choices ? (
-              <FilterChoices name={name}
-                             choices={choices}
-                             onChange={this._handleChoicesChange} />
-            ) : null}
+            <FilterChoices name={name}
+                            choicesAll={choicesAll}
+                            choices={choices}
+                            onChange={this._handleChoicesChange} />
           </div>
         )}
       </div>
@@ -67,6 +71,7 @@ class FilterTable extends Component<FilterTableProps, FilterTableState> {
 
   render() {
     const {
+      choices: initialChoices,
       input,
       filter,
       fields,
@@ -86,7 +91,7 @@ class FilterTable extends Component<FilterTableProps, FilterTableState> {
             <tr>
               {Object.keys(fields).map((f, i) => (
                 <th key={i}>
-                  {this.renderTh(fields, f, choices[f])}
+                  {this.renderTh(fields, f, choices[f], initialChoices[f])}
                 </th>
               ))}
             </tr>

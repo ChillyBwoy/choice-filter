@@ -2,7 +2,8 @@ import * as React from "react";
 import { Component } from "react";
 
 export interface FilterChoicesProps {
-  choices: any[];
+  choices: string[];
+  choicesAll: string[];
   name: string;
   onChange: (name: string, values: any[]) => void;
 }
@@ -46,16 +47,18 @@ class FilterChoices extends Component<FilterChoicesProps, FilterChoicesState> {
     const { values } = this.state;
     const {
       choices,
+      choicesAll,
       name,
     } = this.props;
 
     return (
       <div className="filterChoices">
-        {choices.slice(0).sort().map((c, i) => (
+        {choicesAll.sort().map((c, i) => (
           <label key={i}>
             <input type="checkbox"
                    name={name}
                    value={c}
+                   disabled={choices.indexOf(c) === -1}
                    checked={values.indexOf(c) !== -1}
                    onChange={this._handleChange} />
             <span>{c}</span>

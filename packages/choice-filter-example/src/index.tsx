@@ -62,6 +62,7 @@ const filter = choiceFilter<Person>(fields);
 
 ReactDOM.render(
   <FilterTable
+      choices={filter(people, {}).choices}
       fields={fields}
       filter={filter}
       input={people} />, document.getElementById('root')
